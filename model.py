@@ -23,7 +23,10 @@ class ModelBuilder:
         self.model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
 
     def fit(self, dataset, validation_data, epochs, callbacks):
-        self.model.fit(dataset, validation_data=validation_data, epochs=epochs, callbacks=callbacks)
+        return self.model.fit(dataset, validation_data=validation_data, epochs=epochs, callbacks=callbacks)
+
+    def evaluate(self, data):
+        return self.model.evaluate(data)
 
     def predict(self, data):
         return self.model.predict(data)
