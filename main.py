@@ -1,4 +1,9 @@
-from models import BuildDeepLabV3, BuildEfficientB0Unet
-builder = BuildEfficientB0Unet()
-model = builder(512,5)
+from model import ModelBuilder
+import tensorflow as tf
+
+model = ModelBuilder(512, 5, 'efficientb0')
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
+    loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+    metrics=["accuracy"])
 print(model.summary())

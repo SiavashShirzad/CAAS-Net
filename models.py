@@ -5,6 +5,7 @@ from tensorflow import keras
 class BuildDeepLabV3(keras.Model):
     def __init__(self):
         super().__init__()
+
     def convolution_block(
             self,
             block_input,
@@ -42,7 +43,7 @@ class BuildDeepLabV3(keras.Model):
         output = self.convolution_block(x, kernel_size=1)
         return output
 
-    def deep_lab_v3_plus(self , image_size, num_classes):
+    def deep_lab_v3_plus(self, image_size, num_classes):
         model_input = tf.keras.Input(shape=(image_size, image_size, 3))
         resnet50 = tf.keras.applications.ResNet50(
             weights="imagenet", include_top=False, input_tensor=model_input
@@ -65,19 +66,17 @@ class BuildDeepLabV3(keras.Model):
             interpolation="bilinear",
         )(x)
         model_output = tf.keras.layers.Conv2D(num_classes, kernel_size=(1, 1), padding="same")(x)
-        return tf.keras.Model(inputs = model_input,outputs = model_output)
-    def call(self,image_size , num_classes):
+        return tf.keras.Model(inputs=model_input, outputs=model_output)
+
+    def __call__(self, image_size, num_classes):
         return self.deep_lab_v3_plus(image_size=image_size, num_classes=num_classes)
-
-
-
 
 
 class BuildEfficientB0Unet(keras.Model):
     def __init__(self):
         super().__init__()
 
-    def conv_2d_block(self , inputs, num_filters):
+    def conv_2d_block(self, inputs, num_filters):
         x = tf.keras.layers.Conv2D(num_filters, 3, padding="same")(inputs)
         x = tf.keras.layers.BatchNormalization()(x)
         x = tf.keras.layers.Activation("relu")(x)
@@ -93,8 +92,8 @@ class BuildEfficientB0Unet(keras.Model):
         x = self.conv_2d_block(x, num_filters)
         return x
 
-    def call(self , image_size, number_classes):
-        inputs = tf.keras.layers.Input(shape = (image_size,image_size ,3))
+    def __call__(self, image_size, number_classes):
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
         efficientnet = tf.keras.applications.EfficientNetB0(include_top=False, weights="imagenet", input_tensor=inputs)
 
         e1 = efficientnet.get_layer("input_1").output
@@ -108,5 +107,5 @@ class BuildEfficientB0Unet(keras.Model):
         d4 = self.transpose_skip_block(d3, e1, 128)
 
         outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax")(d4)
-        model = tf.keras.Model(inputs = inputs, outputs = outputs, name="Efficient_B0_Unet")
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name="Efficient_B0_Unet")
         return model
