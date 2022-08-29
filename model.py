@@ -31,5 +31,5 @@ class ModelBuilder:
     def predict(self, data):
         return self.model.predict(data)
 
-    def evaluate(self,data):
+    def evaluate(self, data):
         return self.model.evaluate(data)
