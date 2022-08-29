@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import os
 import nibabel as nib
 import cv2
 import tensorflow as tf
@@ -8,7 +7,7 @@ import tensorflow as tf
 
 class DataPipeLine:
     def __init__(self, data_path, dataframe_path, mask_path, view_number, batch, image_size=512, buffer_size=0,
-                 prefetch=0):
+                 prefetch=0, channels=3):
         self.data_path = data_path
         self.dataframe_path = dataframe_path
         self.view_number = view_number
@@ -17,6 +16,7 @@ class DataPipeLine:
         self.buffer_size = buffer_size
         self.prefetch = prefetch
         self.image_size = image_size
+        self.channels = channels
 
     def dataframe(self):
         return pd.read_csv(self.dataframe_path)
@@ -51,11 +51,11 @@ class DataPipeLine:
             except:
                 continue
 
-    def dataset_generator(self):
+    def dataset_generator(self) -> tf.data.Dataset:
         dataset = tf.data.Dataset.from_generator(
             self.data_generator,
             (tf.float32, tf.int32),
-            (tf.TensorShape([self.image_size, self.image_size, 3]), tf.TensorShape([self.image_size, self.image_size]))
+            (tf.TensorShape([self.image_size, self.image_size, self.channels]), tf.TensorShape([self.image_size, self.image_size]))
         )
         dataset = dataset.shuffle(self.buffer_size)
         dataset = dataset.batch(self.batch)
