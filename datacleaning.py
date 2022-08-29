@@ -11,7 +11,7 @@ def vid_to_array(path):
     vid = vid.pixel_array
 
 
-class DataCleaning():
+class DataCleaning:
     def __init__(self, data_path, save_path):
         self.data_path = data_path
         self.save_path = save_path
@@ -54,3 +54,4 @@ class DataCleaning():
                                     self.save_path + cd + '$' + name + "$" + image + '.nii.gz')
                         except:
                             continue
+
