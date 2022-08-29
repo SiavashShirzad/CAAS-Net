@@ -7,7 +7,8 @@ import tensorflow as tf
 
 
 class DataPipeLine:
-    def __init__(self, data_path, dataframe_path, mask_path, view_number, batch, image_size=512, buffer_size=0, prefetch=0):
+    def __init__(self, data_path, dataframe_path, mask_path, view_number, batch, image_size=512, buffer_size=0,
+                 prefetch=0):
         self.data_path = data_path
         self.dataframe_path = dataframe_path
         self.view_number = view_number
@@ -25,21 +26,20 @@ class DataPipeLine:
 
     def data_preprocess(self, image):
         image = cv2.resize(image, (self.image_size, self.image_size))
-        return image/255.0
+        return image / 255.0
 
     def mask_preprocess(self, image):
-        pass
+        if self.view_number == 3:
+            labeler = lambda x: 1 if x == 7 else (2 if x == 8 else (3 if x == 9 else (4 if x == 10 else (5 if x == 12 else 0))))
+            vfunc = np.vectorize(labeler)
+        return vfunc(image)
 
     def data_generator(self):
         for i in range(self.one_view_dataframe().shape[0]):
             try:
                 mask_vid = nib.load(self.mask_path + '/Multiple_ROI_Mask_' +
                                     self.one_view_dataframe().iloc[i]['File System Source'].split('\\')[1]).get_fdata()
-                mask_vid[np.where(mask_vid == 7)] = 1
-                mask_vid[np.where(mask_vid == 8)] = 2
-                mask_vid[np.where(mask_vid == 9)] = 3
-                mask_vid[np.where(mask_vid == 10)] = 4
-                mask_vid[np.where(mask_vid == 12)] = 5
+                mask_vid = self.mask_preprocess(mask_vid)
                 img_vid = nib.load(
                     self.data_path +
                     self.one_view_dataframe().iloc[i]['File System Source'].split('\\')[1]).get_fdata()
