@@ -30,7 +30,8 @@ class DataPipeLine:
 
     def mask_preprocess(self, image):
         if self.view_number == 3:
-            labeler = lambda x: 1 if x == 7 else (2 if x == 8 else (3 if x == 9 else (4 if x == 10 else (5 if x == 12 else 0))))
+            labeler = lambda x: 1 if x == 7 else (
+                2 if x == 8 else (3 if x == 9 else (4 if x == 10 else (5 if x == 12 else 0))))
             vfunc = np.vectorize(labeler)
         return vfunc(image)
 
@@ -55,7 +56,8 @@ class DataPipeLine:
         dataset = tf.data.Dataset.from_generator(
             self.data_generator,
             (tf.float32, tf.int32),
-            (tf.TensorShape([self.image_size, self.image_size, self.channels]), tf.TensorShape([self.image_size, self.image_size]))
+            (tf.TensorShape([self.image_size, self.image_size, self.channels]),
+             tf.TensorShape([self.image_size, self.image_size]))
         )
         dataset = dataset.shuffle(self.buffer_size)
         dataset = dataset.batch(self.batch)
