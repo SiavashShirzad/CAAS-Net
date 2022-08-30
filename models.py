@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow import keras
 
 
-class BuildDeepLabV3(keras.Model):
+class DeepLabV3Builder(keras.Model):
     def __init__(self):
         super().__init__()
 
@@ -70,7 +70,7 @@ class BuildDeepLabV3(keras.Model):
         return self.deep_lab_v3_plus(image_size=image_size, num_classes=num_classes)
 
 
-class BuildEfficientB0Unet(keras.Model):
+class EfficientB0UnetBuilder(keras.Model):
     def __init__(self):
         super().__init__()
 
@@ -91,12 +91,12 @@ class BuildEfficientB0Unet(keras.Model):
 
     def __call__(self, image_size, number_classes):
         inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        efficientnet = tf.keras.applications.EfficientNetB0(include_top=False, weights="imagenet", input_tensor=inputs)
-        e1 = efficientnet.get_layer("input_1").output
-        e2 = efficientnet.get_layer("block2a_expand_activation").output
-        e3 = efficientnet.get_layer("block3a_expand_activation").output
-        e4 = efficientnet.get_layer("block4a_expand_activation").output
-        e5 = efficientnet.get_layer("block6a_expand_activation").output
+        enb0 = tf.keras.applications.EfficientNetB0(include_top=False, weights="imagenet", input_tensor=inputs)
+        e1 = enb0.get_layer("input_1").output
+        e2 = enb0.get_layer("block2a_expand_activation").output
+        e3 = enb0.get_layer("block3a_expand_activation").output
+        e4 = enb0.get_layer("block4a_expand_activation").output
+        e5 = enb0.get_layer("block6a_expand_activation").output
         d1 = self.transpose_skip_block(e5, e4, 1024)
         d2 = self.transpose_skip_block(d1, e3, 512)
         d3 = self.transpose_skip_block(d2, e2, 256)
