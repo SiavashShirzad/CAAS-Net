@@ -2,6 +2,23 @@ import tensorflow as tf
 from tensorflow import keras
 
 
+def conv_2d_block(inputs, num_filters):
+    x = tf.keras.layers.Conv2D(num_filters, 3, padding="same")(inputs)
+    x = tf.keras.layers.BatchNormalization()(x)
+    x = tf.keras.layers.Activation("relu")(x)
+    x = tf.keras.layers.Conv2D(num_filters, 3, padding="same")(x)
+    x = tf.keras.layers.BatchNormalization()(x)
+    x = tf.keras.layers.Activation("relu")(x)
+    return x
+
+
+def transpose_skip_block(inputs, skip, num_filters):
+    x = tf.keras.layers.Conv2DTranspose(num_filters, (2, 2), strides=2, padding="same")(inputs)
+    x = tf.keras.layers.Concatenate()([x, skip])
+    x = conv_2d_block(x, num_filters)
+    return x
+
+
 class DeepLabV3Builder(keras.Model):
     def __init__(self):
         super().__init__()
@@ -74,21 +91,6 @@ class EfficientB0UnetBuilder(keras.Model):
     def __init__(self):
         super().__init__()
 
-    def conv_2d_block(self, inputs, num_filters):
-        x = tf.keras.layers.Conv2D(num_filters, 3, padding="same")(inputs)
-        x = tf.keras.layers.BatchNormalization()(x)
-        x = tf.keras.layers.Activation("relu")(x)
-        x = tf.keras.layers.Conv2D(num_filters, 3, padding="same")(x)
-        x = tf.keras.layers.BatchNormalization()(x)
-        x = tf.keras.layers.Activation("relu")(x)
-        return x
-
-    def transpose_skip_block(self, inputs, skip, num_filters):
-        x = tf.keras.layers.Conv2DTranspose(num_filters, (2, 2), strides=2, padding="same")(inputs)
-        x = tf.keras.layers.Concatenate()([x, skip])
-        x = self.conv_2d_block(x, num_filters)
-        return x
-
     def __call__(self, image_size, number_classes):
         inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
         enb0 = tf.keras.applications.EfficientNetB0(include_top=False, weights="imagenet", input_tensor=inputs)
@@ -97,10 +99,34 @@ class EfficientB0UnetBuilder(keras.Model):
         e3 = enb0.get_layer("block3a_expand_activation").output
         e4 = enb0.get_layer("block4a_expand_activation").output
         e5 = enb0.get_layer("block6a_expand_activation").output
-        d1 = self.transpose_skip_block(e5, e4, 1024)
-        d2 = self.transpose_skip_block(d1, e3, 512)
-        d3 = self.transpose_skip_block(d2, e2, 256)
-        d4 = self.transpose_skip_block(d3, e1, 128)
+        d1 = transpose_skip_block(e5, e4, 1024)
+        d2 = transpose_skip_block(d1, e3, 512)
+        d3 = transpose_skip_block(d2, e2, 256)
+        d4 = transpose_skip_block(d3, e1, 128)
         outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax")(d4)
-        model = tf.keras.Model(inputs=inputs, outputs=outputs, name="Efficient_B0_Unet")
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name="EfficientB0Unet")
+        return model
+
+
+class VGG16ModelBuilder(keras.Model):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self, image_size, number_classes):
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
+        vgg = tf.keras.applications.VGG16(include_top=False, weights="imagenet", input_tensor=inputs)
+
+        e1 = vgg.get_layer("block1_conv2").output
+        e2 = vgg.get_layer("block2_conv2").output
+        e3 = vgg.get_layer("block3_conv3").output
+        e4 = vgg.get_layer("block4_conv3").output
+        e5 = vgg.get_layer("block5_conv3").output
+        d1 = transpose_skip_block(e5, e4, 512)
+        d2 = transpose_skip_block(d1, e3, 256)
+        d3 = transpose_skip_block(d2, e2, 128)
+        d4 = transpose_skip_block(d3, e1, 64)
+
+        outputs = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid")(d4)
+        model = tf.keras.models.Model(inputs, outputs, name="VGG16Unet")
+
         return model
