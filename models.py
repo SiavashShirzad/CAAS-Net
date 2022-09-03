@@ -126,7 +126,7 @@ class VGG16ModelBuilder(keras.Model):
         d3 = transpose_skip_block(d2, e2, 128)
         d4 = transpose_skip_block(d3, e1, 64)
 
-        outputs = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid")(d4)
+        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="sigmoid")(d4)
         model = tf.keras.models.Model(inputs, outputs, name="VGG16Unet")
 
         return model
@@ -156,7 +156,7 @@ class SimpleUnetBuilder(keras.Model):
         d3 = transpose_skip_block(d2, s2, 128)
         d4 = transpose_skip_block(d3, s1, 64)
 
-        outputs = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid")(d4)
+        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="sigmoid")(d4)
 
         model = tf.keras.models.Model(inputs, outputs, name="SimpleUnet")
         return model
