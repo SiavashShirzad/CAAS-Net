@@ -1,4 +1,4 @@
-from models import DeepLabV3Builder, EfficientB0UnetBuilder, VGG16ModelBuilder
+from models import DeepLabV3Builder, EfficientB0UnetBuilder, VGG16ModelBuilder, SimpleUnetBuilder
 
 
 class ModelBuilder:
@@ -18,6 +18,10 @@ class ModelBuilder:
 
         if self.model_name == "vgg16":
             model_builder = VGG16ModelBuilder()
+            self.model = model_builder(self.image_size, self.number_classes)
+
+        if self.model_name == "SimpleUnet":
+            model_builder = SimpleUnetBuilder()
             self.model = model_builder(self.image_size, self.number_classes)
 
     def summary(self):
