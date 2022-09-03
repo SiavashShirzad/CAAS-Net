@@ -130,3 +130,34 @@ class VGG16ModelBuilder(keras.Model):
         model = tf.keras.models.Model(inputs, outputs, name="VGG16Unet")
 
         return model
+
+
+class SimpleUnetBuilder(keras.Model):
+
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self, image_size, number_classes):
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
+
+        s1 = conv_2d_block(inputs, image_size / 8)
+        e1 = tf.keras.layers.MaxPooling2D((2, 2))(s1)
+        s2 = conv_2d_block(e1, image_size / 4)
+        e2 = tf.keras.layers.MaxPooling2D((2, 2))(s2)
+        s3 = conv_2d_block(e2, image_size / 2)
+        e3 = tf.keras.layers.MaxPooling2D((2, 2))(s3)
+        s4 = conv_2d_block(e3, image_size)
+        e4 = tf.keras.layers.MaxPooling2D((2, 2))(s4)
+
+        e5 = conv_2d_block(e4, 2 * image_size)
+
+        d1 = transpose_skip_block(e5, s4, 512)
+        d2 = transpose_skip_block(d1, s3, 256)
+        d3 = transpose_skip_block(d2, s2, 128)
+        d4 = transpose_skip_block(d3, s1, 64)
+
+        outputs = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid")(d4)
+
+        model = tf.keras.models.Model(inputs, outputs, name="SimpleUnet")
+        return model
+
