@@ -43,7 +43,7 @@ class DeepLabV3Builder(keras.Model):
         x = tf.keras.layers.BatchNormalization()(x)
         return tf.keras.layers.ReLU()(x)
 
-    def dialated_spatial_pyramid_pooling(self, dspp_input):
+    def dilated_spatial_pyramid_pooling(self, dspp_input):
         dims = dspp_input.shape
         x = tf.keras.layers.AveragePooling2D(pool_size=(dims[-3], dims[-2]))(dspp_input)
         x = self.convolution_block(x, kernel_size=1, use_bias=True)
@@ -64,7 +64,7 @@ class DeepLabV3Builder(keras.Model):
             weights="imagenet", include_top=False, input_tensor=model_input
         )
         x = resnet.get_layer("conv4_block6_2_relu").output
-        x = self.dialated_spatial_pyramid_pooling(x)
+        x = self.dilated_spatial_pyramid_pooling(x)
 
         input_a = tf.keras.layers.UpSampling2D(
             size=(image_size // 4 // x.shape[1], image_size // 4 // x.shape[2]),
@@ -126,7 +126,7 @@ class VGG16ModelBuilder(keras.Model):
         d3 = transpose_skip_block(d2, e2, 128)
         d4 = transpose_skip_block(d3, e1, 64)
 
-        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="sigmoid")(d4)
+        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax")(d4)
         model = tf.keras.models.Model(inputs, outputs, name="VGG16Unet")
 
         return model
@@ -148,7 +148,6 @@ class SimpleUnetBuilder(keras.Model):
         e3 = tf.keras.layers.MaxPooling2D((2, 2))(s3)
         s4 = conv_2d_block(e3, image_size)
         e4 = tf.keras.layers.MaxPooling2D((2, 2))(s4)
-
         e5 = conv_2d_block(e4, 2 * image_size)
 
         d1 = transpose_skip_block(e5, s4, 512)
@@ -156,8 +155,31 @@ class SimpleUnetBuilder(keras.Model):
         d3 = transpose_skip_block(d2, s2, 128)
         d4 = transpose_skip_block(d3, s1, 64)
 
-        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="sigmoid")(d4)
+        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax")(d4)
 
         model = tf.keras.models.Model(inputs, outputs, name="SimpleUnet")
         return model
 
+
+class ResNet50Builder(keras.Model):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self, image_size, number_classes):
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
+        resnet50 = tf.keras.applications.ResNet50(include_top=False, weights="imagenet", input_tensor=inputs)
+
+        e1 = resnet50.get_layer("input_1").output
+        e2 = resnet50.get_layer("conv1_relu").output
+        e3 = resnet50.get_layer("conv2_block3_out").output
+        e4 = resnet50.get_layer("conv3_block4_out").output
+        e5 = resnet50.get_layer("conv4_block6_out").output
+        d1 = transpose_skip_block(e5, e4, 512)
+        d2 = transpose_skip_block(d1, e3, 256)
+        d3 = transpose_skip_block(d2, e2, 128)
+        d4 = transpose_skip_block(d3, e1, 64)
+
+        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax")(d4)
+        model = tf.keras.models.Model(inputs, outputs, name="VGG16Unet")
+
+        return model
