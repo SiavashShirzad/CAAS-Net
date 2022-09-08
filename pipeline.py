@@ -52,7 +52,7 @@ class DataPipeLine:
             except:
                 continue
 
-    def dataset_generator(self) -> tf.data.Dataset:
+    def dataset_generator(self):
         dataset = tf.data.Dataset.from_generator(
             self.data_generator,
             (tf.float32, tf.int32),
