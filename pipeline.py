@@ -5,6 +5,13 @@ import cv2
 import tensorflow as tf
 
 
+def low_dose_preprocess(image, mask):
+    if image[:72, :].mean() < 75:
+        return cv2.resize(image[72:440, 72:440], (512, 512)), cv2.resize(mask[72:440, 72:440], (512, 512))
+    else:
+        return image, mask
+
+
 class DataPipeLine:
     def __init__(self, data_path, dataframe_path, mask_path, view_number, batch, image_size=512, buffer_size=0,
                  prefetch=0, channels=3):
@@ -45,9 +52,10 @@ class DataPipeLine:
                     self.data_path +
                     self.one_view_dataframe().iloc[i]['File System Source'].split('\\')[1]).get_fdata()
                 for img in np.unique(np.where(mask_vid > 0)[0]):
-                    yield np.stack([self.data_preprocess(img_vid[img]),
-                                    self.data_preprocess(img_vid[img]),
-                                    self.data_preprocess(img_vid[img])], axis=-1), mask_vid[img]
+                    final_image, final_mask = low_dose_preprocess(self.data_preprocess(img_vid[img]), mask_vid[img])
+                    yield np.stack([final_image,
+                                    final_image,
+                                    final_image], axis=-1),
 
             except:
                 continue
