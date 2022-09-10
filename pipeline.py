@@ -14,7 +14,7 @@ def low_dose_preprocess(image, mask):
 
 class DataPipeLine:
     def __init__(self, data_path, dataframe_path, mask_path, view_number, batch, image_size=512, buffer_size=0,
-                 prefetch=0, channels=3):
+                 prefetch=0, channels=3, class_weight=15):
         self.data_path = data_path
         self.dataframe_path = dataframe_path
         self.view_number = view_number
@@ -24,6 +24,7 @@ class DataPipeLine:
         self.prefetch = prefetch
         self.image_size = image_size
         self.channels = channels
+        self.class_weight = class_weight
 
     def dataframe(self):
         return pd.read_csv(self.dataframe_path)
@@ -53,6 +54,8 @@ class DataPipeLine:
                     self.one_view_dataframe().iloc[i]['File System Source'].split('\\')[1]).get_fdata()
                 for img in np.unique(np.where(mask_vid > 0)[0]):
                     final_image, final_mask = low_dose_preprocess(self.data_preprocess(img_vid[img]), mask_vid[img])
+                    pixel_weight = np.ones(shape=final_mask.shape)
+                    pixel_weight[pixel_weight != 0] = self.class_weight
                     yield np.stack([final_image,
                                     final_image,
                                     final_image], axis=-1),
