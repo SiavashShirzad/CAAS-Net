@@ -206,3 +206,37 @@ class DenseNet121Unet(keras.Model):
         outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax")(d4)
         model = tf.keras.models.Model(inputs, outputs, name="DenseNet121")
         return model
+
+
+class DenseNet121UUnet(keras.Model):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self, image_size, number_classes):
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
+        densenet121 = tf.keras.applications.DenseNet121(include_top=False, weights="imagenet", input_tensor=inputs)
+
+        e1 = densenet121.get_layer("input_1").output
+        e2 = densenet121.get_layer("conv1/relu").output
+        e3 = densenet121.get_layer("pool2_relu").output
+        e4 = densenet121.get_layer("pool3_relu").output
+        e5 = densenet121.get_layer("pool4_relu").output
+
+        # Multi class decoder of UU-Net
+        d1 = transpose_skip_block(e5, e4, 512)
+        d2 = transpose_skip_block(d1, e3, 256)
+        d3 = transpose_skip_block(d2, e2, 128)
+        d4 = transpose_skip_block(d3, e1, 64)
+
+        # Binary class decoder of UU-Net
+        bd1 = transpose_skip_block(e5, e4, 512)
+        bd2 = transpose_skip_block(bd1, e3, 256)
+        bd3 = transpose_skip_block(bd2, e2, 128)
+        bd4 = transpose_skip_block(bd3, e1, 64)
+
+        output1 = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(
+            d4)
+        output2 = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid", name="single")(
+            bd4)
+        model = tf.keras.models.Model(inputs, outputs=[output1, output2], name="DenseNet121")
+        return model
