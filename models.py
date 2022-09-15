@@ -234,9 +234,63 @@ class DenseNet121UUnet(keras.Model):
         bd3 = transpose_skip_block(bd2, e2, 128)
         bd4 = transpose_skip_block(bd3, e1, 64)
 
+        # one head will predict the mask for all coronary arteries using sigmoid, and the other predicts classes
         output1 = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(
             d4)
         output2 = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid", name="single")(
             bd4)
         model = tf.keras.models.Model(inputs, outputs=[output1, output2], name="DenseNet121")
+        return model
+
+
+'''
+another implementation of U-Net called W-Net. 
+We used it to first detect all coronary arteries and then anatomically classify them.
+'''
+
+
+class SimpleWnetBuilder(keras.Model):
+
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self, image_size, number_classes):
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
+
+        # first part of encoder-decoder to segment all coronary areteries
+        s1 = conv_2d_block(inputs, image_size / 8)
+        e1 = tf.keras.layers.MaxPooling2D((2, 2))(s1)
+        s2 = conv_2d_block(e1, image_size / 4)
+        e2 = tf.keras.layers.MaxPooling2D((2, 2))(s2)
+        s3 = conv_2d_block(e2, image_size / 2)
+        e3 = tf.keras.layers.MaxPooling2D((2, 2))(s3)
+        s4 = conv_2d_block(e3, image_size)
+        e4 = tf.keras.layers.MaxPooling2D((2, 2))(s4)
+        e5 = conv_2d_block(e4, 2 * image_size)
+
+        d1 = transpose_skip_block(e5, s4, 512)
+        d2 = transpose_skip_block(d1, s3, 256)
+        d3 = transpose_skip_block(d2, s2, 128)
+        d4 = transpose_skip_block(d3, s1, 64)
+
+        output1 = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid", name="single")(d4)
+
+        s2_1 = conv_2d_block(output1, image_size / 8)
+        e2_1 = tf.keras.layers.MaxPooling2D((2, 2))(s2_1)
+        s2_2 = conv_2d_block(e2_1, image_size / 4)
+        e2_2 = tf.keras.layers.MaxPooling2D((2, 2))(s2_2)
+        s2_3 = conv_2d_block(e2_2, image_size / 2)
+        e2_3 = tf.keras.layers.MaxPooling2D((2, 2))(s2_3)
+        s2_4 = conv_2d_block(e2_3, image_size)
+        e2_4 = tf.keras.layers.MaxPooling2D((2, 2))(s2_4)
+        e2_5 = conv_2d_block(e2_4, 2 * image_size)
+
+        d2_1 = transpose_skip_block(e2_5, s2_4, 512)
+        d2_2 = transpose_skip_block(d2_1, s2_3, 256)
+        d2_3 = transpose_skip_block(d2_2, s2_2, 128)
+        d2_4 = transpose_skip_block(d2_3, s2_1, 64)
+
+        output2 = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multiple")(d2_4)
+
+        model = tf.keras.models.Model(inputs, outputs=[output1, output2], name="SimpleUnet")
         return model
