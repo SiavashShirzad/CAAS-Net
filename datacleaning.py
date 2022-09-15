@@ -42,7 +42,7 @@ class DataCleaning:
 
     def dicom_to_nifti(self):
         angio_list = os.listdir(self.data_path)
-        for cd in tqdm(angio_list[9:]):
+        for cd in tqdm(angio_list):
             for name in os.listdir(self.data_path + '/' + cd):
                 if name[0] == 'd':
                     for image in os.listdir(self.data_path + "/" + cd + '/' + name):
