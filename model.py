@@ -1,5 +1,6 @@
 from models import DeepLabV3Builder, EfficientB0UnetBuilder, VGG16ModelBuilder, SimpleUnetBuilder, ResNet50Builder, \
     DenseNet121Unet, DenseNet121UUnet, SimpleWnetBuilder, EfficientB0WnetBuilder
+import tensorflow as tf
 
 
 class ModelBuilder:
@@ -62,3 +63,10 @@ class ModelBuilder:
 
     def evaluate(self, data):
         return self.model.evaluate(data)
+
+    def visualize(self, save_path: str):
+        tf.keras.utils.plot_model(
+            self.model,
+            to_file=save_path + '.png',
+            dpi=96,
+        )
