@@ -1,5 +1,5 @@
 from models import DeepLabV3Builder, EfficientB0UnetBuilder, VGG16ModelBuilder, SimpleUnetBuilder, ResNet50Builder, \
-    DenseNet121Unet, DenseNet121UUnet, SimpleWnetBuilder
+    DenseNet121Unet, DenseNet121UUnet, SimpleWnetBuilder, EfficientB0WnetBuilder
 
 
 class ModelBuilder:
@@ -39,6 +39,10 @@ class ModelBuilder:
 
         if self.model_name == "SimpleWnet":
             model_builder = SimpleWnetBuilder()
+            self.model = model_builder(self.image_size, self.number_classes)
+
+        if self.model_name == "EfficientWnet":
+            model_builder = EfficientB0WnetBuilder()
             self.model = model_builder(self.image_size, self.number_classes)
 
     def summary(self):
