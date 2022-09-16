@@ -8,4 +8,4 @@ model.compile(
           'single': tf.keras.losses.BinaryCrossentropy()},
     metrics={'multi': ['accuracy'],
              'single': ['accuracy']})
-print(model.summary())
+model.visualize("../../Downloads/model1")
