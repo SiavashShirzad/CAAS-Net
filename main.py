@@ -1,7 +1,7 @@
 from model import ModelBuilder
 import tensorflow as tf
 
-model = ModelBuilder(512, 5, 'SimpleWnet')
+model = ModelBuilder(512, 5, 'EfficientWnet')
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
     loss={'multi': tf.keras.losses.SparseCategoricalCrossentropy(),
