@@ -1,5 +1,6 @@
 from models import DeepLabV3Builder, EfficientB0UnetBuilder, VGG16ModelBuilder, SimpleUnetBuilder, ResNet50Builder, \
-    DenseNet121Unet, DenseNet121UUnet, SimpleWnetBuilder, EfficientB0WnetBuilder, EfficientB0UUnetBuilder
+    DenseNet121Unet, DenseNet121UUnet, SimpleWnetBuilder, EfficientB0WnetBuilder, EfficientB0UUnetBuilder, \
+    ResNet50UUnetBuilder
 import tensorflow as tf
 
 
@@ -48,6 +49,10 @@ class ModelBuilder:
 
         if self.model_name == "EfficientUUnet":
             model_builder = EfficientB0UUnetBuilder()
+            self.model = model_builder(self.image_size, self.number_classes)
+
+        if self.model_name == "ResNetUUnet":
+            model_builder = ResNet50UUnetBuilder()
             self.model = model_builder(self.image_size, self.number_classes)
 
     def summary(self):
