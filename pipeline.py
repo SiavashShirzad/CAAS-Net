@@ -5,15 +5,23 @@ import cv2
 import tensorflow as tf
 
 
-def low_dose_preprocess(image, mask):
-    if image[:72, :].mean() < 75:
-        return cv2.resize(image[72:440, 72:440], (512, 512)), cv2.resize(mask[72:440, 72:440], (512, 512))
+def low_dose_preprocess(image, mask, mask2=None):
+    if mask2:
+        if image[:72, :].mean() < 75:
+            return cv2.resize(image[72:440, 72:440], (512, 512)), cv2.resize(mask[72:440, 72:440], (512, 512)), \
+                   cv2.resize(mask2[72:440, 72:440], (512, 512))
+        else:
+            return image, mask, mask2
     else:
-        return image, mask
+        if image[:72, :].mean() < 75:
+            return cv2.resize(image[72:440, 72:440], (512, 512)), cv2.resize(mask[72:440, 72:440], (512, 512))
+        else:
+            return image, mask
 
 
 class DataPipeLine:
-    def __init__(self, data_path, dataframe_path, mask_path, view_number, batch, image_size=512, buffer_size=0,
+    def __init__(self, data_path, dataframe_path, mask_path, view_number, batch, mask2_path=None, image_size=512,
+                 buffer_size=0,
                  prefetch=0, channels=3, class_weight=15):
         self.data_path = data_path
         self.dataframe_path = dataframe_path
@@ -25,6 +33,7 @@ class DataPipeLine:
         self.image_size = image_size
         self.channels = channels
         self.class_weight = class_weight
+        self.mask2_path = mask2_path
 
     def dataframe(self):
         return pd.read_csv(self.dataframe_path)
@@ -52,25 +61,53 @@ class DataPipeLine:
                 img_vid = nib.load(
                     self.data_path +
                     self.one_view_dataframe().iloc[i]['File System Source'].split('\\')[1]).get_fdata()
-                for img in np.unique(np.where(mask_vid > 0)[0]):
-                    final_image, final_mask = low_dose_preprocess(self.data_preprocess(img_vid[img]), mask_vid[img])
-                    pixel_weight = np.ones(shape=final_mask.shape)
-                    pixel_weight[pixel_weight != 0] = self.class_weight
-                    yield np.stack([final_image,
-                                    final_image,
-                                    final_image], axis=-1),
+
+                if self.mask2_path:
+                    mask2_vid = nib.load(self.mask2_path + '/Multiple_ROI_Mask_' +
+                                         self.one_view_dataframe().iloc[i]['File System Source'].split('\\')[
+                                             1]).get_fdata()
+                    mask2_vid = self.mask_preprocess(mask2_vid)
+                    for img in np.unique(np.where(mask_vid > 0)[0]):
+                        final_image, final_mask, final_mask2 = low_dose_preprocess(self.data_preprocess(img_vid[img]),
+                                                                                   mask_vid[img], mask2_vid[img])
+                        pixel_weight = np.ones(shape=final_mask.shape)
+                        pixel_weight[pixel_weight != 0] = self.class_weight
+                        yield np.stack([final_image,
+                                        final_image,
+                                        final_image], axis=-1), final_mask, final_mask2
+                else:
+                    for img in np.unique(np.where(mask_vid > 0)[0]):
+                        final_image, final_mask = low_dose_preprocess(self.data_preprocess(img_vid[img]), mask_vid[img])
+                        pixel_weight = np.ones(shape=final_mask.shape)
+                        pixel_weight[pixel_weight != 0] = self.class_weight
+                        yield np.stack([final_image,
+                                        final_image,
+                                        final_image], axis=-1), final_mask
 
             except:
                 continue
 
     def dataset_generator(self):
-        dataset = tf.data.Dataset.from_generator(
-            self.data_generator,
-            (tf.float32, tf.int32),
-            (tf.TensorShape([self.image_size, self.image_size, self.channels]),
-             tf.TensorShape([self.image_size, self.image_size]))
-        )
-        dataset = dataset.shuffle(self.buffer_size)
-        dataset = dataset.batch(self.batch)
-        dataset = dataset.prefetch(self.prefetch)
-        return dataset
+        if self.mask2_path:
+            dataset = tf.data.Dataset.from_generator(
+                self.data_generator,
+                (tf.float32, tf.int32, tf.int32),
+                (tf.TensorShape([self.image_size, self.image_size, self.channels]),
+                 tf.TensorShape([self.image_size, self.image_size]),
+                 tf.TensorShape([self.image_size, self.image_size]))
+            )
+            dataset = dataset.shuffle(self.buffer_size)
+            dataset = dataset.batch(self.batch)
+            dataset = dataset.prefetch(self.prefetch)
+            return dataset
+        else:
+            dataset = tf.data.Dataset.from_generator(
+                self.data_generator,
+                (tf.float32, tf.int32),
+                (tf.TensorShape([self.image_size, self.image_size, self.channels]),
+                 tf.TensorShape([self.image_size, self.image_size]))
+            )
+            dataset = dataset.shuffle(self.buffer_size)
+            dataset = dataset.batch(self.batch)
+            dataset = dataset.prefetch(self.prefetch)
+            return dataset
