@@ -5,20 +5,6 @@ import cv2
 import tensorflow as tf
 
 
-def low_dose_preprocess(image, mask, mask2=None):
-    if mask2:
-        if image[:72, :].mean() < 75:
-            return cv2.resize(image[72:440, 72:440], (512, 512)), cv2.resize(mask[72:440, 72:440], (512, 512)), \
-                   cv2.resize(mask2[72:440, 72:440], (512, 512))
-        else:
-            return image, mask, mask2
-    else:
-        if image[:72, :].mean() < 75:
-            return cv2.resize(image[72:440, 72:440], (512, 512)), cv2.resize(mask[72:440, 72:440], (512, 512))
-        else:
-            return image, mask
-
-
 class DataPipeLine:
     def __init__(self, data_path, dataframe_path, mask_path, view_number, batch, mask2_path=None, image_size=512,
                  buffer_size=0,
@@ -52,6 +38,21 @@ class DataPipeLine:
             vfunc = np.vectorize(labeler)
         return vfunc(image)
 
+    def low_dose_preprocess(self, image, mask, mask2=None):
+        if mask2:
+            if image[:72, :].mean() < 75:
+                return cv2.resize(image[72:440, 72:440], (self.image_size, self.image_size)),\
+                       cv2.resize(mask[72:440, 72:440], (self.image_size, self.image_size)), \
+                       cv2.resize(mask2[72:440, 72:440], (self.image_size, self.image_size))
+            else:
+                return image, mask, mask2
+        else:
+            if image[:72, :].mean() < 75:
+                return cv2.resize(image[72:440, 72:440], (self.image_size, self.image_size)),\
+                       cv2.resize(mask[72:440, 72:440], (self.image_size, self.image_size))
+            else:
+                return image, mask
+
     def data_generator(self):
         for i in range(self.one_view_dataframe().shape[0]):
             try:
@@ -66,9 +67,8 @@ class DataPipeLine:
                     mask2_vid = nib.load(self.mask2_path + '/Multiple_ROI_Mask_' +
                                          self.one_view_dataframe().iloc[i]['File System Source'].split('\\')[
                                              1]).get_fdata()
-                    mask2_vid = self.mask_preprocess(mask2_vid)
                     for img in np.unique(np.where(mask_vid > 0)[0]):
-                        final_image, final_mask, final_mask2 = low_dose_preprocess(self.data_preprocess(img_vid[img]),
+                        final_image, final_mask, final_mask2 = self.low_dose_preprocess(self.data_preprocess(img_vid[img]),
                                                                                    mask_vid[img], mask2_vid[img])
                         pixel_weight = np.ones(shape=final_mask.shape)
                         pixel_weight[pixel_weight != 0] = self.class_weight
@@ -77,7 +77,7 @@ class DataPipeLine:
                                         final_image], axis=-1), final_mask, final_mask2
                 else:
                     for img in np.unique(np.where(mask_vid > 0)[0]):
-                        final_image, final_mask = low_dose_preprocess(self.data_preprocess(img_vid[img]), mask_vid[img])
+                        final_image, final_mask = self.low_dose_preprocess(self.data_preprocess(img_vid[img]), mask_vid[img])
                         pixel_weight = np.ones(shape=final_mask.shape)
                         pixel_weight[pixel_weight != 0] = self.class_weight
                         yield np.stack([final_image,
