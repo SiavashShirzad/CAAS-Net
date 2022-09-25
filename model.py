@@ -1,6 +1,6 @@
 from models import DeepLabV3Builder, EfficientB0UnetBuilder, VGG16ModelBuilder, SimpleUnetBuilder, ResNet50Builder, \
     DenseNet121Unet, DenseNet121UUnet, SimpleWnetBuilder, EfficientB0WnetBuilder, EfficientB0UUnetBuilder, \
-    ResNet50UUnetBuilder
+    ResNet50UUnetBuilder, ResNetRSUnet, ResNetRSUUnet
 import tensorflow as tf
 
 
@@ -55,6 +55,13 @@ class ModelBuilder:
             model_builder = ResNet50UUnetBuilder()
             self.model = model_builder(self.image_size, self.number_classes)
 
+        if self.model_name == "ResNetRSUnet":
+            model_builder = ResNetRSUnet()
+            self.model = model_builder(self.image_size, self.number_classes)
+        if self.model_name == "ResNetRSUUnet":
+            model_builder = ResNetRSUUnet()
+            self.model = model_builder(self.image_size, self.number_classes)
+
     def summary(self):
         return self.model.summary()
 
@@ -77,5 +84,5 @@ class ModelBuilder:
         tf.keras.utils.plot_model(
             self.model,
             to_file=save_path + '.png',
-            dpi=96,
+            dpi=600,
         )
