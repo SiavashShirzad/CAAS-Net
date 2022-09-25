@@ -212,6 +212,33 @@ class DenseNet121Unet(keras.Model):
         return model
 
 
+class ResNetRSUnet(keras.Model):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self, image_size, number_classes):
+        inputs = tf.keras.layers.Input(shape=(512, 512, 3))
+        resnetRS = tf.keras.applications.resnet_rs.ResNetRS50(
+            include_top=False,
+            weights=None,
+            input_tensor=inputs,
+        )
+        e1 = resnetRS.get_layer("input_1").output
+        e2 = resnetRS.get_layer("stem_1_stem_act_3").output
+        e3 = resnetRS.get_layer("BlockGroup3__block_0__act_1").output
+        e4 = resnetRS.get_layer("BlockGroup4__block_0__act_1").output
+        e5 = resnetRS.get_layer("BlockGroup5__block_0__act_1").output
+
+        d1 = transpose_skip_block(e5, e4, image_size)
+        d2 = transpose_skip_block(d1, e3, image_size // 2)
+        d3 = transpose_skip_block(d2, e2, image_size // 4)
+        d4 = transpose_skip_block(d3, e1, image_size // 8)
+
+        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax")(d4)
+        model = tf.keras.models.Model(inputs, outputs, name="DenseNet121")
+        return model
+
+
 '''
 UUNet are based on Unet architecture with backbone with an additional head. One of the decoding heads returns binary 
 classification and the other head returns multi-class classification. Both heads' losses will affect the backbone's head 
@@ -288,6 +315,44 @@ class EfficientB0UUnetBuilder(keras.Model):
         model = tf.keras.models.Model(inputs, outputs=[output1, output2], name="DenseNet121")
         return model
 
+
+class ResNetRSUUnet(keras.Model):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self, image_size, number_classes):
+        inputs = tf.keras.layers.Input(shape=(512, 512, 3))
+        resnetRS = tf.keras.applications.resnet_rs.ResNetRS50(
+            include_top=False,
+            weights=None,
+            input_tensor=inputs,
+        )
+        e1 = resnetRS.get_layer("input_1").output
+        e2 = resnetRS.get_layer("stem_1_stem_act_3").output
+        e3 = resnetRS.get_layer("BlockGroup3__block_0__act_1").output
+        e4 = resnetRS.get_layer("BlockGroup4__block_0__act_1").output
+        e5 = resnetRS.get_layer("BlockGroup5__block_0__act_1").output
+
+        # Multi class decoder of UU-Net
+        d1 = transpose_skip_block(e5, e4, image_size)
+        d2 = transpose_skip_block(d1, e3, image_size // 2)
+        d3 = transpose_skip_block(d2, e2, image_size // 4)
+        d4 = transpose_skip_block(d3, e1, image_size // 8)
+
+        # Binary class decoder of UU-Net
+        bd1 = transpose_skip_block(e5, e4, image_size)
+        bd2 = transpose_skip_block(bd1, e3, image_size // 2)
+        bd3 = transpose_skip_block(bd2, e2, image_size // 4)
+        bd4 = transpose_skip_block(bd3, e1, image_size // 8)
+
+        # one head will predict the mask for all coronary arteries using sigmoid, and the other predicts classes
+        output1 = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(
+            d4)
+        output2 = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid", name="single")(
+            bd4)
+        model = tf.keras.models.Model(inputs, outputs=[output1, output2], name="ResNetRSUUNet")
+
+        return model
 
 class ResNet50UUnetBuilder(keras.Model):
     def __init__(self):
