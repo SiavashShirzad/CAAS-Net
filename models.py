@@ -80,7 +80,7 @@ class DeepLabV3Builder(keras.Model):
             size=(image_size // x.shape[1], image_size // x.shape[2]),
             interpolation="bilinear",
         )(x)
-        model_output = tf.keras.layers.Conv2D(num_classes, kernel_size=(1, 1), padding="same")(x)
+        model_output = tf.keras.layers.Conv2D(num_classes, kernel_size=(1, 1), padding="same", activation="softmax")(x)
         return tf.keras.Model(inputs=model_input, outputs=model_output)
 
     def __call__(self, image_size, num_classes):
