@@ -80,6 +80,14 @@ class ModelBuilder:
     def evaluate(self, data):
         return self.model.evaluate(data)
 
+    def load_best(self, weight_path):
+        self.model.load_weights(weight_path).expect_partial()
+        print("Model is loaded.")
+
+    def save(self, path):
+        tf.keras.models.save_model(self.model, path, include_optimizer=False)
+        print("model is saved")
+
     def visualize(self, save_path: str):
         tf.keras.utils.plot_model(
             self.model,
