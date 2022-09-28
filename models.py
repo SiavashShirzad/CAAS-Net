@@ -354,6 +354,7 @@ class ResNetRSUUnet(keras.Model):
 
         return model
 
+
 class ResNet50UUnetBuilder(keras.Model):
     def __init__(self):
         super().__init__()
