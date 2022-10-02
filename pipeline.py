@@ -36,10 +36,11 @@ class DataPipeLine:
 
     def mask_preprocess(self, image):
         if self.view_number == 3:
-            labeler = lambda x: 1 if x == 7 else (
-                2 if x == 8 else (3 if x == 9 else (4 if x == 10 else (5 if x == 12 else 0))))
-            vfunc = np.vectorize(labeler)
-            image = vfunc(image)
+            image[np.where(image == 7)] = 1
+            image[np.where(image == 8)] = 2
+            image[np.where(image == 9)] = 3
+            image[np.where(image == 10)] = 4
+            image[np.where(image == 12)] = 5
             return image
         else:
             return image
