@@ -1,6 +1,6 @@
 from models import DeepLabV3Builder, EfficientB0UnetBuilder, VGG16ModelBuilder, SimpleUnetBuilder, ResNet50Builder, \
     DenseNet121Unet, DenseNet121UUnet, SimpleWnetBuilder, EfficientB0WnetBuilder, EfficientB0UUnetBuilder, \
-    ResNet50UUnetBuilder, ResNetRSUnet, ResNetRSUUnet
+    ResNet50UUnetBuilder, ResNetRSUnet, ResNetRSUUnet, ResNetRSTridentNet
 import tensorflow as tf
 
 
@@ -58,8 +58,13 @@ class ModelBuilder:
         if self.model_name == "ResNetRSUnet":
             model_builder = ResNetRSUnet()
             self.model = model_builder(self.image_size, self.number_classes)
+
         if self.model_name == "ResNetRSUUnet":
             model_builder = ResNetRSUUnet()
+            self.model = model_builder(self.image_size, self.number_classes)
+
+        if self.model_name == "ResNetRSTridentNet":
+            model_builder = ResNetRSTridentNet()
             self.model = model_builder(self.image_size, self.number_classes)
 
     def summary(self):
@@ -68,7 +73,7 @@ class ModelBuilder:
     def compile(self, optimizer, loss, metrics):
         self.model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
 
-    def fit(self, dataset, validation_data, epochs, callbacks):
+    def fit(self, dataset, validation_data=None, epochs=100, callbacks=None):
         return self.model.fit(dataset, validation_data=validation_data, epochs=epochs, callbacks=callbacks)
 
     def evaluate(self, data):
