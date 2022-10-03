@@ -78,11 +78,9 @@ class DataPipeLine:
                 else:
                     for img in np.unique(np.where(mask_vid > 0)[0]):
                         final_image, final_mask = self.low_dose_preprocess(self.data_preprocess(img_vid[img]), mask_vid[img])
-                        pixel_weight = np.ones(shape=final_mask.shape)
-                        pixel_weight[pixel_weight != 0] = self.class_weight
                         yield np.stack([final_image,
                                         final_image,
-                                        final_image], axis=-1), final_mask
+                                        final_image], axis = -1), final_mask
 
             except:
                 continue
