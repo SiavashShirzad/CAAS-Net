@@ -535,7 +535,7 @@ class ResNetRSTridentNet(keras.Model):
             d4)
         output2 = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid", name="single")(
             bd4)
-        output3 = tf.keras.layers.Dense(6, activation="softmax", name="classifier")(
+        output3 = tf.keras.layers.Dense(7, activation="softmax", name="classifier")(
             X)
         model = tf.keras.models.Model(inputs, outputs=[output1, output2, output3], name="ResNetRSTridentNet")
 
