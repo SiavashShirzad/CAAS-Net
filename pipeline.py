@@ -144,9 +144,9 @@ class DataPipeLine:
                 dataset = tf.data.Dataset.from_generator(
                     self.data_generator,
                     ({"input_1": tf.float32}, {"multi": tf.int32, "classifier": tf.int8}),
-                    (tf.TensorShape([self.image_size, self.image_size, self.channels]),
-                     tf.TensorShape([self.image_size, self.image_size]),
-                     tf.TensorShape([]))
+                    ({"input_1": tf.TensorShape([self.image_size, self.image_size, self.channels])},
+                     {"multi": tf.TensorShape([self.image_size, self.image_size]),
+                      "classifier": tf.TensorShape([])})
                 )
                 dataset = dataset.shuffle(self.buffer_size)
                 dataset = dataset.batch(self.batch)
@@ -160,10 +160,10 @@ class DataPipeLine:
                 print("generating dataset with two masks ...")
                 dataset = tf.data.Dataset.from_generator(
                     self.data_generator,
-                    (tf.float32, tf.int32, tf.int32),
-                    (tf.TensorShape([self.image_size, self.image_size, self.channels]),
-                     tf.TensorShape([self.image_size, self.image_size]),
-                     tf.TensorShape([self.image_size, self.image_size]))
+                    ({"input_1": tf.float32}, {"multi": tf.int32, "single": tf.int32}),
+                    ({"input_1": tf.TensorShape([self.image_size, self.image_size, self.channels])},
+                     {"multi": tf.TensorShape([self.image_size, self.image_size]),
+                      "single": tf.TensorShape([self.image_size, self.image_size])})
                 )
                 dataset = dataset.shuffle(self.buffer_size)
                 dataset = dataset.batch(self.batch)
@@ -175,9 +175,9 @@ class DataPipeLine:
                 print("generating dataset with one mask ...")
                 dataset = tf.data.Dataset.from_generator(
                     self.data_generator,
-                    (tf.float32, tf.int32),
-                    (tf.TensorShape([self.image_size, self.image_size, self.channels]),
-                     tf.TensorShape([self.image_size, self.image_size]))
+                    ({"input_1": tf.float32}, {"multi": tf.int32}),
+                    ({"input_1": tf.TensorShape([self.image_size, self.image_size, self.channels])},
+                     {"multi": tf.TensorShape([self.image_size, self.image_size])})
                 )
                 dataset = dataset.shuffle(self.buffer_size)
                 dataset = dataset.batch(self.batch)
