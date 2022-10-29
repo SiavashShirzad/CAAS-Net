@@ -528,7 +528,6 @@ class ResNetRSTridentNet(keras.Model):
         X = keras.layers.BatchNormalization()(X)
         X = keras.layers.Dense(32, activation="relu")(X)
         X = keras.layers.Dense(16, activation="relu")(X)
-        X = keras.layers.Dense(8, activation="relu")(X)
 
         # one head will predict the mask for all coronary arteries using sigmoid, and the other predicts classes
         output1 = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(
