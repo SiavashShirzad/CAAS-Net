@@ -540,19 +540,23 @@ class ResNetRSTridentNet(keras.Model):
 
         return model
 
-class EfficientB0UUnetBuilder(keras.Model):
+
+class EfficientTridentNet(keras.Model):
     def __init__(self):
         super().__init__()
 
     def __call__(self, image_size, number_classes):
-        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        enb0 = tf.keras.applications.EfficientNetB0(include_top=False, weights="imagenet", input_tensor=inputs)
-
-        e1 = enb0.get_layer("input_1").output
-        e2 = enb0.get_layer("block2a_expand_activation").output
-        e3 = enb0.get_layer("block3a_expand_activation").output
-        e4 = enb0.get_layer("block4a_expand_activation").output
-        e5 = enb0.get_layer("block6a_expand_activation").output
+        inputs = tf.keras.layers.Input(shape=(512, 512, 3))
+        base = tf.keras.applications.EfficientNetB0(
+            include_top=False,
+            weights=None,
+            input_tensor=inputs,
+        )
+        e1 = base.get_layer("input_1").output
+        e2 = base.get_layer("block2a_expand_activation").output
+        e3 = base.get_layer("block3a_expand_activation").output
+        e4 = base.get_layer("block4a_expand_activation").output
+        e5 = base.get_layer("block6a_expand_activation").output
 
         # Multi class decoder of TridentNet
         d1 = transpose_skip_block(e5, e4, image_size)
@@ -567,7 +571,7 @@ class EfficientB0UUnetBuilder(keras.Model):
         bd4 = transpose_skip_block(bd3, e1, image_size // 8)
 
         # Classifier head
-        X = resnetRS.get_layer("BlockGroup5__block_2__output_act").output
+        X = base.get_layer("top_activation").output
         X = keras.layers.MaxPooling2D()(X)
         X = keras.layers.Flatten()(X)
         X = keras.layers.BatchNormalization()(X)
@@ -581,6 +585,7 @@ class EfficientB0UUnetBuilder(keras.Model):
             bd4)
         output3 = tf.keras.layers.Dense(7, activation="softmax", name="classifier")(
             X)
-        model = tf.keras.models.Model(inputs, outputs=[output1, output2, output3], name="ResNetRSTridentNet")
+        model = tf.keras.models.Model(inputs, outputs=[output1, output2, output3], name="EfficientTridentNet")
 
         return model
+
