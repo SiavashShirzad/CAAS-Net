@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 data_path = "C:/CardioAI/nifti/"
 mask_path = 'C:/CardioAI/masks/'
 data_frame = 'C:/CardioAI/Final series.csv'
-model_name = 'EfficientTridentNet'
+model_name = 'AttentionEfficientTridentNet'
 
 data_pipeline = DataPipeLine(data_path, data_frame, mask_path, 0, 1, mask2=True)
 dataset = data_pipeline.dataset_generator()
