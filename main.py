@@ -1,7 +1,6 @@
 from model import ModelBuilder
 from pipeline import DataPipeLine
 import tensorflow as tf
-import matplotlib.pyplot as plt
 
 data_path = "C:/CardioAI/nifti/"
 mask_path = 'C:/CardioAI/masks/'
