@@ -125,13 +125,13 @@ class VGG16ModelBuilder(keras.Model):
 
     def __call__(self, image_size, number_classes):
         inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        vgg = tf.keras.applications.VGG16(include_top=False, weights="imagenet", input_tensor=inputs)
+        base = tf.keras.applications.VGG16(include_top=False, weights="imagenet", input_tensor=inputs)
 
-        e1 = vgg.get_layer("block1_conv2").output
-        e2 = vgg.get_layer("block2_conv2").output
-        e3 = vgg.get_layer("block3_conv3").output
-        e4 = vgg.get_layer("block4_conv3").output
-        e5 = vgg.get_layer("block5_conv3").output
+        e1 = base.get_layer("block1_conv2").output
+        e2 = base.get_layer("block2_conv2").output
+        e3 = base.get_layer("block3_conv3").output
+        e4 = base.get_layer("block4_conv3").output
+        e5 = base.get_layer("block5_conv3").output
         d1 = transpose_skip_block(e5, e4, 512)
         d2 = transpose_skip_block(d1, e3, 256)
         d3 = transpose_skip_block(d2, e2, 128)
@@ -178,13 +178,13 @@ class ResNet50Builder(keras.Model):
 
     def __call__(self, image_size, number_classes):
         inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        resnet50 = tf.keras.applications.ResNet50(include_top=False, weights="imagenet", input_tensor=inputs)
+        base = tf.keras.applications.ResNet50(include_top=False, weights="imagenet", input_tensor=inputs)
 
-        e1 = resnet50.get_layer("input_1").output
-        e2 = resnet50.get_layer("conv1_relu").output
-        e3 = resnet50.get_layer("conv2_block3_out").output
-        e4 = resnet50.get_layer("conv3_block4_out").output
-        e5 = resnet50.get_layer("conv4_block6_out").output
+        e1 = base.get_layer("input_1").output
+        e2 = base.get_layer("conv1_relu").output
+        e3 = base.get_layer("conv2_block3_out").output
+        e4 = base.get_layer("conv3_block4_out").output
+        e5 = base.get_layer("conv4_block6_out").output
         d1 = transpose_skip_block(e5, e4, 512)
         d2 = transpose_skip_block(d1, e3, 256)
         d3 = transpose_skip_block(d2, e2, 128)
@@ -202,13 +202,14 @@ class DenseNet121Unet(keras.Model):
 
     def __call__(self, image_size, number_classes):
         inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        densenet121 = tf.keras.applications.DenseNet121(include_top=False, weights="imagenet", input_tensor=inputs)
+        base = tf.keras.applications.DenseNet121(include_top=False, weights="imagenet", input_tensor=inputs)
 
-        e1 = densenet121.get_layer("input_1").output
-        e2 = densenet121.get_layer("conv1/relu").output
-        e3 = densenet121.get_layer("pool2_relu").output
-        e4 = densenet121.get_layer("pool3_relu").output
-        e5 = densenet121.get_layer("pool4_relu").output
+        e1 = base.get_layer("input_1").output
+        e2 = base.get_layer("conv1/relu").output
+        e3 = base.get_layer("pool2_relu").output
+        e4 = base.get_layer("pool3_relu").output
+        e5 = base.get_layer("pool4_relu").output
+
         d1 = transpose_skip_block(e5, e4, image_size)
         d2 = transpose_skip_block(d1, e3, image_size // 2)
         d3 = transpose_skip_block(d2, e2, image_size // 4)
@@ -225,16 +226,16 @@ class ResNetRSUnet(keras.Model):
 
     def __call__(self, image_size, number_classes):
         inputs = tf.keras.layers.Input(shape=(512, 512, 3))
-        resnetRS = tf.keras.applications.resnet_rs.ResNetRS50(
+        base = tf.keras.applications.resnet_rs.ResNetRS50(
             include_top=False,
             weights=None,
             input_tensor=inputs,
         )
-        e1 = resnetRS.get_layer("input_1").output
-        e2 = resnetRS.get_layer("stem_1_stem_act_3").output
-        e3 = resnetRS.get_layer("BlockGroup3__block_0__act_1").output
-        e4 = resnetRS.get_layer("BlockGroup4__block_0__act_1").output
-        e5 = resnetRS.get_layer("BlockGroup5__block_0__act_1").output
+        e1 = base.get_layer("input_1").output
+        e2 = base.get_layer("stem_1_stem_act_3").output
+        e3 = base.get_layer("BlockGroup3__block_0__act_1").output
+        e4 = base.get_layer("BlockGroup4__block_0__act_1").output
+        e5 = base.get_layer("BlockGroup5__block_0__act_1").output
 
         d1 = transpose_skip_block(e5, e4, image_size)
         d2 = transpose_skip_block(d1, e3, image_size // 2)
@@ -259,13 +260,13 @@ class DenseNet121UUnet(keras.Model):
 
     def __call__(self, image_size, number_classes):
         inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        densenet121 = tf.keras.applications.DenseNet121(include_top=False, weights="imagenet", input_tensor=inputs)
+        base = tf.keras.applications.DenseNet121(include_top=False, weights="imagenet", input_tensor=inputs)
 
-        e1 = densenet121.get_layer("input_1").output
-        e2 = densenet121.get_layer("conv1/relu").output
-        e3 = densenet121.get_layer("pool2_relu").output
-        e4 = densenet121.get_layer("pool3_relu").output
-        e5 = densenet121.get_layer("pool4_relu").output
+        e1 = base.get_layer("input_1").output
+        e2 = base.get_layer("conv1/relu").output
+        e3 = base.get_layer("pool2_relu").output
+        e4 = base.get_layer("pool3_relu").output
+        e5 = base.get_layer("pool4_relu").output
 
         # Multi class decoder of UU-Net
         d1 = transpose_skip_block(e5, e4, image_size)
@@ -294,13 +295,13 @@ class EfficientB0UUnetBuilder(keras.Model):
 
     def __call__(self, image_size, number_classes):
         inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        enb0 = tf.keras.applications.EfficientNetB0(include_top=False, weights="imagenet", input_tensor=inputs)
+        base = tf.keras.applications.EfficientNetB0(include_top=False, weights="imagenet", input_tensor=inputs)
 
-        e1 = enb0.get_layer("input_1").output
-        e2 = enb0.get_layer("block2a_expand_activation").output
-        e3 = enb0.get_layer("block3a_expand_activation").output
-        e4 = enb0.get_layer("block4a_expand_activation").output
-        e5 = enb0.get_layer("block6a_expand_activation").output
+        e1 = base.get_layer("input_1").output
+        e2 = base.get_layer("block2a_expand_activation").output
+        e3 = base.get_layer("block3a_expand_activation").output
+        e4 = base.get_layer("block4a_expand_activation").output
+        e5 = base.get_layer("block6a_expand_activation").output
 
         # Multi class decoder of UU-Net
         d1 = transpose_skip_block(e5, e4, image_size)
@@ -329,16 +330,16 @@ class ResNetRSUUnet(keras.Model):
 
     def __call__(self, image_size, number_classes):
         inputs = tf.keras.layers.Input(shape=(512, 512, 3))
-        resnetRS = tf.keras.applications.resnet_rs.ResNetRS50(
+        base = tf.keras.applications.resnet_rs.ResNetRS50(
             include_top=False,
             weights=None,
             input_tensor=inputs,
         )
-        e1 = resnetRS.get_layer("input_1").output
-        e2 = resnetRS.get_layer("stem_1_stem_act_3").output
-        e3 = resnetRS.get_layer("BlockGroup3__block_0__act_1").output
-        e4 = resnetRS.get_layer("BlockGroup4__block_0__act_1").output
-        e5 = resnetRS.get_layer("BlockGroup5__block_0__act_1").output
+        e1 = base.get_layer("input_1").output
+        e2 = base.get_layer("stem_1_stem_act_3").output
+        e3 = base.get_layer("BlockGroup3__block_0__act_1").output
+        e4 = base.get_layer("BlockGroup4__block_0__act_1").output
+        e5 = base.get_layer("BlockGroup5__block_0__act_1").output
 
         # Multi class decoder of UU-Net
         d1 = transpose_skip_block(e5, e4, image_size)
@@ -368,13 +369,13 @@ class ResNet50UUnetBuilder(keras.Model):
 
     def __call__(self, image_size, number_classes):
         inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        resnet50 = tf.keras.applications.ResNet50(include_top=False, weights="imagenet", input_tensor=inputs)
+        base = tf.keras.applications.ResNet50(include_top=False, weights="imagenet", input_tensor=inputs)
 
-        e1 = resnet50.get_layer("input_1").output
-        e2 = resnet50.get_layer("conv1_relu").output
-        e3 = resnet50.get_layer("conv2_block3_out").output
-        e4 = resnet50.get_layer("conv3_block4_out").output
-        e5 = resnet50.get_layer("conv4_block6_out").output
+        e1 = base.get_layer("input_1").output
+        e2 = base.get_layer("conv1_relu").output
+        e3 = base.get_layer("conv2_block3_out").output
+        e4 = base.get_layer("conv3_block4_out").output
+        e5 = base.get_layer("conv4_block6_out").output
 
         # Multi class decoder of UU-Net
         d1 = transpose_skip_block(e5, e4, image_size)
@@ -457,14 +458,14 @@ class EfficientB0WnetBuilder(keras.Model):
 
     def __call__(self, image_size, number_classes):
         inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        enb0 = tf.keras.applications.EfficientNetB0(include_top=False, weights="imagenet", input_tensor=inputs)
+        base = tf.keras.applications.EfficientNetB0(include_top=False, weights="imagenet", input_tensor=inputs)
 
         # first part of encoder-decoder to segment all coronary areteries
-        e1 = enb0.get_layer("input_1").output
-        e2 = enb0.get_layer("block2a_expand_activation").output
-        e3 = enb0.get_layer("block3a_expand_activation").output
-        e4 = enb0.get_layer("block4a_expand_activation").output
-        e5 = enb0.get_layer("block6a_expand_activation").output
+        e1 = base.get_layer("input_1").output
+        e2 = base.get_layer("block2a_expand_activation").output
+        e3 = base.get_layer("block3a_expand_activation").output
+        e4 = base.get_layer("block4a_expand_activation").output
+        e5 = base.get_layer("block6a_expand_activation").output
 
         d1 = transpose_skip_block(e5, e4, 1024)
         d2 = transpose_skip_block(d1, e3, 512)
@@ -505,16 +506,16 @@ class ResNetRSTridentNet(keras.Model):
 
     def __call__(self, image_size, number_classes):
         inputs = tf.keras.layers.Input(shape=(512, 512, 3))
-        resnetRS = tf.keras.applications.resnet_rs.ResNetRS50(
+        base = tf.keras.applications.resnet_rs.ResNetRS50(
             include_top=False,
             weights=None,
             input_tensor=inputs,
         )
-        e1 = resnetRS.get_layer("input_1").output
-        e2 = resnetRS.get_layer("stem_1_stem_act_3").output
-        e3 = resnetRS.get_layer("BlockGroup3__block_0__act_1").output
-        e4 = resnetRS.get_layer("BlockGroup4__block_0__act_1").output
-        e5 = resnetRS.get_layer("BlockGroup5__block_0__act_1").output
+        e1 = base.get_layer("input_1").output
+        e2 = base.get_layer("stem_1_stem_act_3").output
+        e3 = base.get_layer("BlockGroup3__block_0__act_1").output
+        e4 = base.get_layer("BlockGroup4__block_0__act_1").output
+        e5 = base.get_layer("BlockGroup5__block_0__act_1").output
 
         # Multi class decoder of TridentNet
         d1 = transpose_skip_block(e5, e4, image_size)
@@ -529,7 +530,7 @@ class ResNetRSTridentNet(keras.Model):
         bd4 = transpose_skip_block(bd3, e1, image_size // 8)
 
         # Classifier head
-        X = resnetRS.get_layer("BlockGroup5__block_2__output_act").output
+        X = base.get_layer("BlockGroup5__block_2__output_act").output
         X = keras.layers.MaxPooling2D()(X)
         X = keras.layers.Flatten()(X)
         X = keras.layers.BatchNormalization()(X)
