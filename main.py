@@ -28,7 +28,7 @@ model.compile(
              'single': ['accuracy'],
              'classifier': ['accuracy']})
 print(model.summary())
-model.fit(dataset.take(300), validation_data=dataset.skip(300), epochs=30, callbacks=callback)
+model.fit(dataset.skip(30), validation_data=dataset.take(30), epochs=30, callbacks=callback)
 
 model.load_best('./model_weights/'+model_name)
 model.save("./saved_models/"+model_name)
