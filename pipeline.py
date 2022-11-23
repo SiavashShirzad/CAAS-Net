@@ -41,11 +41,6 @@ class DataPipeLine:
 
     def mask_preprocess(self, image):
         if self.view_number == 3:
-            image[np.where(image == 7)] = 1
-            image[np.where(image == 8)] = 2
-            image[np.where(image == 9)] = 3
-            image[np.where(image == 10)] = 4
-            image[np.where(image == 12)] = 5
             return image
         else:
             return image
@@ -109,14 +104,12 @@ class DataPipeLine:
                     for img in np.unique(np.where(mask_vid > 0)[0]):
                         final_image, final_mask = self.low_dose_preprocess(self.data_preprocess(img_vid[img]),
                                                                            mask_vid[img])
-
                         final_image = np.stack([final_image,
                                                 final_image,
                                                 final_image], axis=-1)
-                        yield {"input_1": final_image, "multi": final_mask}
+                        yield {"input_1": final_image}, {"multi": final_mask}
 
             except:
-
                 continue
 
     def dataset_generator(self) -> tf.data.Dataset:
@@ -160,7 +153,7 @@ class DataPipeLine:
                 print("generating dataset with two masks ...")
                 dataset = tf.data.Dataset.from_generator(
                     self.data_generator,
-                    ({"input_1": tf.float32}, {"multi": tf.int32, "single": tf.int32}),
+                    ({"input_1": tf.float32}, {"multi": tf.float32, "single": tf.float32}),
                     ({"input_1": tf.TensorShape([self.image_size, self.image_size, self.channels])},
                      {"multi": tf.TensorShape([self.image_size, self.image_size]),
                       "single": tf.TensorShape([self.image_size, self.image_size])})
@@ -175,7 +168,7 @@ class DataPipeLine:
                 print("generating dataset with one mask ...")
                 dataset = tf.data.Dataset.from_generator(
                     self.data_generator,
-                    ({"input_1": tf.float32}, {"multi": tf.int32}),
+                    ({"input_1": tf.float32}, {"multi": tf.float32}),
                     ({"input_1": tf.TensorShape([self.image_size, self.image_size, self.channels])},
                      {"multi": tf.TensorShape([self.image_size, self.image_size])})
                 )
