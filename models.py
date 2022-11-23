@@ -87,7 +87,8 @@ class DeepLabV3Builder(keras.Model):
             size=(image_size // x.shape[1], image_size // x.shape[2]),
             interpolation="bilinear",
         )(x)
-        model_output = tf.keras.layers.Conv2D(num_classes, kernel_size=(1, 1), padding="same", activation="softmax")(x)
+        model_output = tf.keras.layers.Conv2D(num_classes, kernel_size=(1, 1), padding="same", activation="softmax",
+                                              name="multi")(x)
         return tf.keras.Model(inputs=model_input, outputs=model_output)
 
     def __call__(self, image_size, num_classes):
@@ -113,7 +114,7 @@ class EfficientB0UnetBuilder(keras.Model):
         d3 = transpose_skip_block(d2, e2, 256)
         d4 = transpose_skip_block(d3, e1, 128)
 
-        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax")(d4)
+        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(d4)
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name="EfficientB0Unet")
 
         return model
@@ -137,7 +138,7 @@ class VGG16ModelBuilder(keras.Model):
         d3 = transpose_skip_block(d2, e2, 128)
         d4 = transpose_skip_block(d3, e1, 64)
 
-        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax")(d4)
+        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(d4)
         model = tf.keras.models.Model(inputs, outputs, name="VGG16Unet")
 
         return model
@@ -166,7 +167,7 @@ class SimpleUnetBuilder(keras.Model):
         d3 = transpose_skip_block(d2, s2, 128)
         d4 = transpose_skip_block(d3, s1, 64)
 
-        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax")(d4)
+        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(d4)
 
         model = tf.keras.models.Model(inputs, outputs, name="SimpleUnet")
         return model
@@ -190,7 +191,7 @@ class ResNet50Builder(keras.Model):
         d3 = transpose_skip_block(d2, e2, 128)
         d4 = transpose_skip_block(d3, e1, 64)
 
-        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax")(d4)
+        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(d4)
         model = tf.keras.models.Model(inputs, outputs, name="VGG16Unet")
 
         return model
@@ -215,7 +216,7 @@ class DenseNet121Unet(keras.Model):
         d3 = transpose_skip_block(d2, e2, image_size // 4)
         d4 = transpose_skip_block(d3, e1, image_size // 8)
 
-        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax")(d4)
+        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(d4)
         model = tf.keras.models.Model(inputs, outputs, name="DenseNet121")
         return model
 
@@ -242,7 +243,7 @@ class ResNetRSUnet(keras.Model):
         d3 = transpose_skip_block(d2, e2, image_size // 4)
         d4 = transpose_skip_block(d3, e1, image_size // 8)
 
-        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax")(d4)
+        outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(d4)
         model = tf.keras.models.Model(inputs, outputs, name="DenseNet121")
         return model
 
