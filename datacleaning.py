@@ -1,10 +1,8 @@
 import pydicom as dicom
 import os
-import numpy as np
 import matplotlib
 from tqdm import tqdm
 import nibabel as nib
-
 
 def vid_to_array(path):
     vid = dicom.dcmread(path)
@@ -54,4 +52,3 @@ class DataCleaning:
                                     self.save_path + cd + '$' + name + "$" + image + '.nii.gz')
                         except:
                             continue
-

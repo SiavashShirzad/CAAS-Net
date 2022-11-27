@@ -26,7 +26,7 @@ model.compile(
 )
 
 print(model.summary())
-model.fit(dataset.skip(5), validation_data=dataset.take(5), epochs=30, callbacks=callback)
+model.fit(dataset.skip(5), validation_data=dataset.take(5), epochs=100, callbacks=callback)
 
 model.load_best('./model_weights/' + model_name)
 model.save("./saved_models/" + model_name)
