@@ -2,7 +2,7 @@
 
 # Fully automated anatomic segmentation for coronary artery angiography
 
-#final evaluation set sample for ResNetRS50 model:
+#final evaluation set sample for DeepLabV3 model:
 ![alt text](https://i.ibb.co/X8VCRv6/Figure-1.png)
 
 #final evaluation set sample for AttentionEfficientWNet model:

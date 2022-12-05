@@ -19,7 +19,7 @@ class ModelBuilder:
             model_builder = AttentionEfficientTridentNet()
             self.model = model_builder(self.image_size, self.number_classes)
 
-        if self.model_name == "efficientb0":
+        if self.model_name == "EfficientB0Unet":
             model_builder = EfficientB0UnetBuilder()
             self.model = model_builder(self.image_size, self.number_classes)
 
@@ -35,7 +35,7 @@ class ModelBuilder:
             model_builder = ResNet50Builder()
             self.model = model_builder(self.image_size, self.number_classes)
 
-        if self.model_name == "DenseNetUnet":
+        if self.model_name == "DenseNet121":
             model_builder = DenseNet121Unet()
             self.model = model_builder(self.image_size, self.number_classes)
 
