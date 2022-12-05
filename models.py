@@ -116,7 +116,6 @@ class EfficientB0UnetBuilder(keras.Model):
 
         outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(d4)
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name="EfficientB0Unet")
-
         return model
 
 
@@ -140,7 +139,6 @@ class VGG16ModelBuilder(keras.Model):
 
         outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(d4)
         model = tf.keras.models.Model(inputs, outputs, name="VGG16Unet")
-
         return model
 
 
@@ -360,7 +358,6 @@ class ResNetRSUUnet(keras.Model):
         output2 = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid", name="single")(
             bd4)
         model = tf.keras.models.Model(inputs, outputs=[output1, output2], name="ResNetRSUUNet")
-
         return model
 
 
@@ -453,48 +450,41 @@ class SimpleWnetBuilder(keras.Model):
         return model
 
 
-class EfficientB0WnetBuilder(keras.Model):
+class AttentionEfficientWNet(keras.Model):
     def __init__(self):
         super().__init__()
 
     def __call__(self, image_size, number_classes):
-        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        base = tf.keras.applications.EfficientNetB0(include_top=False, weights="imagenet", input_tensor=inputs)
-
-        # first part of encoder-decoder to segment all coronary areteries
+        inputs = tf.keras.layers.Input(shape=(512, 512, 3))
+        base = tf.keras.applications.EfficientNetB0(
+            include_top=False,
+            weights=None,
+            input_tensor=inputs,
+        )
         e1 = base.get_layer("input_1").output
         e2 = base.get_layer("block2a_expand_activation").output
         e3 = base.get_layer("block3a_expand_activation").output
         e4 = base.get_layer("block4a_expand_activation").output
         e5 = base.get_layer("block6a_expand_activation").output
 
-        d1 = transpose_skip_block(e5, e4, 1024)
-        d2 = transpose_skip_block(d1, e3, 512)
-        d3 = transpose_skip_block(d2, e2, 256)
-        d4 = transpose_skip_block(d3, e1, 128)
+        # Binary class decoder of TridentNet
+        bd1 = transpose_skip_block(e5, e4, image_size)
+        bd2 = transpose_skip_block(bd1, e3, image_size // 2)
+        bd3 = transpose_skip_block(bd2, e2, image_size // 4)
+        bd4 = transpose_skip_block(bd3, e1, image_size // 8)
 
-        output1 = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid", name="single")(d4)
+        # Multi class decoder of TridentNet
+        d1 = transpose_skip_block_v2(e5, e4, bd1, image_size)
+        d2 = transpose_skip_block_v2(d1, e3, bd2, image_size // 2)
+        d3 = transpose_skip_block_v2(d2, e2, bd3, image_size // 4)
+        d4 = transpose_skip_block_v2(d3, e1, bd4, image_size // 8)
 
-        # Second part of the model to anatomically classify first part's output
-        s2_1 = conv_2d_block(output1, image_size / 8)
-        e2_1 = tf.keras.layers.MaxPooling2D((2, 2))(s2_1)
-        s2_2 = conv_2d_block(e2_1, image_size / 4)
-        e2_2 = tf.keras.layers.MaxPooling2D((2, 2))(s2_2)
-        s2_3 = conv_2d_block(e2_2, image_size / 2)
-        e2_3 = tf.keras.layers.MaxPooling2D((2, 2))(s2_3)
-        s2_4 = conv_2d_block(e2_3, image_size)
-        e2_4 = tf.keras.layers.MaxPooling2D((2, 2))(s2_4)
-        e2_5 = conv_2d_block(e2_4, 2 * image_size)
-
-        d2_1 = transpose_skip_block(e2_5, s2_4, 512)
-        d2_2 = transpose_skip_block(d2_1, s2_3, 256)
-        d2_3 = transpose_skip_block(d2_2, s2_2, 128)
-        d2_4 = transpose_skip_block(d2_3, s2_1, 64)
-
-        output2 = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multiple")(d2_4)
-
-        model = tf.keras.Model(inputs=inputs, outputs=[output1, output2], name="EfficientB0Wnet")
-
+        # one head will predict the mask for all coronary arteries using sigmoid, and the other predicts classes
+        output1 = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(
+            d4)
+        output2 = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid", name="single")(
+            bd4)
+        model = tf.keras.models.Model(inputs, outputs=[output1, output2], name="AttentionEfficientWNet")
         return model
 
 
@@ -546,7 +536,6 @@ class ResNetRSTridentNet(keras.Model):
         output3 = tf.keras.layers.Dense(7, activation="softmax", name="classifier")(
             X)
         model = tf.keras.models.Model(inputs, outputs=[output1, output2, output3], name="ResNetRSTridentNet")
-
         return model
 
 
@@ -595,7 +584,6 @@ class EfficientTridentNet(keras.Model):
         output3 = tf.keras.layers.Dense(7, activation="softmax", name="classifier")(
             X)
         model = tf.keras.models.Model(inputs, outputs=[output1, output2, output3], name="EfficientTridentNet")
-
         return model
 
 
@@ -644,5 +632,4 @@ class AttentionEfficientTridentNet(keras.Model):
         output3 = tf.keras.layers.Dense(7, activation="softmax", name="classifier")(
             X)
         model = tf.keras.models.Model(inputs, outputs=[output1, output2, output3], name="AttentionEfficientTridentNet")
-
         return model
