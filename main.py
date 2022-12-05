@@ -19,9 +19,9 @@ def dice_coef_loss(y_true, y_pred, smooth=1e-6):
 data_path = "C:/CardioAI/nifti/"
 mask_path = 'C:/CardioAI/masks/'
 data_frame = 'C:/CardioAI/Final series.csv'
-model_name = 'AttentionEfficientWNet'
+model_name = 'DenseNet121'
 
-data_pipeline = DataPipeLine(data_path, data_frame, mask_path, view_number=3, batch=2, mask2=True)
+data_pipeline = DataPipeLine(data_path, data_frame, mask_path, view_number=3, batch=2, mask2=False)
 dataset = data_pipeline.dataset_generator()
 
 callback = model_checkpoint_callback_LASSO = tf.keras.callbacks.ModelCheckpoint(
@@ -35,10 +35,8 @@ callback = model_checkpoint_callback_LASSO = tf.keras.callbacks.ModelCheckpoint(
 model = ModelBuilder(512, 24, model_name)
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-    loss={'multi': tf.keras.losses.SparseCategoricalCrossentropy(),
-          'single': dice_coef_loss},
-    metrics={'multi': ['Accuracy'],
-             'single': ['Accuracy', 'Precision', 'Recall']}
+    loss={'multi': tf.keras.losses.SparseCategoricalCrossentropy()},
+    metrics={'multi': ['Accuracy']}
 )
 
 print(model.summary())
