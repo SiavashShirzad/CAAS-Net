@@ -1,13 +1,27 @@
 from model import ModelBuilder
 from pipeline import DataPipeLine
 import tensorflow as tf
+from tensorflow.keras import backend as K
+
+
+def dice_coef(y_true, y_pred, smooth):
+    y_true_f = K.flatten(y_true)
+    y_pred_f = K.flatten(y_pred)
+    intersection = K.sum(y_true_f * y_pred_f)
+    dice = (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+    return dice
+
+
+def dice_coef_loss(y_true, y_pred, smooth=1e-6):
+    return 1 - dice_coef(y_true, y_pred, smooth)
+
 
 data_path = "C:/CardioAI/nifti/"
 mask_path = 'C:/CardioAI/masks/'
 data_frame = 'C:/CardioAI/Final series.csv'
-model_name = 'deeplab'
+model_name = 'AttentionEfficientWNet'
 
-data_pipeline = DataPipeLine(data_path, data_frame, mask_path, view_number=3, batch=2, mask2=False)
+data_pipeline = DataPipeLine(data_path, data_frame, mask_path, view_number=3, batch=2, mask2=True)
 dataset = data_pipeline.dataset_generator()
 
 callback = model_checkpoint_callback_LASSO = tf.keras.callbacks.ModelCheckpoint(
@@ -21,8 +35,10 @@ callback = model_checkpoint_callback_LASSO = tf.keras.callbacks.ModelCheckpoint(
 model = ModelBuilder(512, 24, model_name)
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-    loss={'multi': tf.keras.losses.SparseCategoricalCrossentropy()},
-    metrics={'multi': ['Accuracy']}
+    loss={'multi': tf.keras.losses.SparseCategoricalCrossentropy(),
+          'single': dice_coef_loss},
+    metrics={'multi': ['Accuracy'],
+             'single': ['Accuracy', 'Precision', 'Recall']}
 )
 
 print(model.summary())
