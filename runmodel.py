@@ -13,7 +13,7 @@ dataset = data_pipeline.dataset_generator()
 
 model = tf.keras.models.load_model("./saved_models/" + model_name)
 
-for data in dataset.skip(11).take(1):
+for data in dataset.skip(16).take(1):
     pic = data[0]['input_1']
     mask = data[1]['multi']
     print(pic.shape, mask.shape)
