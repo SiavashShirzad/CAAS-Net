@@ -69,8 +69,10 @@ class DataPipeLine:
                 return image, mask
 
     def data_generator(self):
-
-        for i in range(self.process_dataframe().shape[0]):
+        num_patients = self.process_dataframe().shape[0]
+        patients_list = np.arange(num_patients)
+        patient_random_list = np.random.choice(patients_list, size=num_patients, replace=False)
+        for i in patient_random_list:
             try:
                 mask_vid = nib.load(self.mask_path + '/Multiple_ROI_Mask_' +
                                     self.process_dataframe().iloc[i]['File System Source'].split('\\')[1]).get_fdata()
