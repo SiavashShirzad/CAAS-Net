@@ -19,7 +19,7 @@ def dice_coef_loss(y_true, y_pred, smooth=1e-6):
 data_path = "C:/CardioAI/nifti/"
 mask_path = 'C:/CardioAI/masks/'
 data_frame = 'C:/CardioAI/Final series.csv'
-model_name = 'DenseNet121'
+model_name = 'SimpleUnet'
 
 data_pipeline = DataPipeLine(data_path, data_frame, mask_path, view_number=3, batch=2, mask2=False)
 dataset = data_pipeline.dataset_generator()
@@ -40,7 +40,7 @@ model.compile(
 )
 
 print(model.summary())
-model.fit(dataset.skip(3), validation_data=dataset.take(10), epochs=100, callbacks=callback)
+model.fit(dataset.skip(10), validation_data=dataset.take(10), epochs=100, callbacks=callback)
 
 model.load_best('./model_weights/' + model_name)
 model.save("./saved_models/" + model_name)

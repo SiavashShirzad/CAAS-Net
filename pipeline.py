@@ -9,7 +9,7 @@ class DataPipeLine:
     def __init__(self, data_path: str, dataframe_path: str,
                  mask_path: str, view_number: int, batch=1,
                  mask2=False, image_size=512, buffer_size=1,
-                 prefetch=1, channels=3, class_weight=15):
+                 prefetch=1, channels=3, class_weight=15, augmentation=0.0):
 
         self.data_path = data_path
         self.dataframe_path = dataframe_path
@@ -22,9 +22,13 @@ class DataPipeLine:
         self.channels = channels
         self.class_weight = class_weight
         self.mask2 = mask2
+        self.augmentation = augmentation
 
     def dataframe(self):
         return pd.read_csv(self.dataframe_path)
+
+    def augmentate(self, image):
+        pass
 
     def process_dataframe(self):
         if self.view_number == 0:
@@ -69,9 +73,11 @@ class DataPipeLine:
                 return image, mask
 
     def data_generator(self):
+        # Randomizing patients
         num_patients = self.process_dataframe().shape[0]
         patients_list = np.arange(num_patients)
         patient_random_list = np.random.choice(patients_list, size=num_patients, replace=False)
+
         for i in patient_random_list:
             try:
                 mask_vid = nib.load(self.mask_path + '/Multiple_ROI_Mask_' +
