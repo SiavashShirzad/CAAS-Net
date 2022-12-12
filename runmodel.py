@@ -6,14 +6,14 @@ import matplotlib.pyplot as plt
 data_path = "C:/CardioAI/nifti/"
 mask_path = 'C:/CardioAI/masks/'
 data_frame = 'C:/CardioAI/Final series.csv'
-model_name = 'DenseNet121'
+model_name = 'SimpleUnet'
 
 data_pipeline = DataPipeLine(data_path, data_frame, mask_path, view_number=3, batch=1, mask2=False)
 dataset = data_pipeline.dataset_generator()
 
 model = tf.keras.models.load_model("./saved_models/" + model_name)
 
-for data in dataset.skip(16).take(1):
+for data in dataset.skip(5).take(1):
     pic = data[0]['input_1']
     mask = data[1]['multi']
     print(pic.shape, mask.shape)
