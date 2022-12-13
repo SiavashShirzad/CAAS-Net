@@ -3,15 +3,24 @@ from pipeline import DataPipeLine
 import numpy as np
 import matplotlib.pyplot as plt
 
-data_path = "C:/CardioAI/nifti/"
-mask_path = 'C:/CardioAI/masks/'
-data_frame = 'C:/CardioAI/Final series.csv'
-model_name = 'DenseNet121'
+DATA_PATH = "C:/CardioAI/nifti/"
+MASK_PATH = 'C:/CardioAI/masks/'
+DATAFRAME = 'C:/CardioAI/Final series.csv'
+MODEL_NAME = 'DenseNet121'
+IMAGE_SIZE = 224
+CHANNELS = 24
+VIEW_NUMBER = 2
 
-data_pipeline = DataPipeLine(data_path, data_frame, mask_path, view_number=3, batch=1, mask2=False, image_size=224)
+data_pipeline = DataPipeLine(DATA_PATH,
+                             DATAFRAME,
+                             MASK_PATH,
+                             view_number=VIEW_NUMBER,
+                             batch=1,
+                             mask2=False,
+                             image_size=IMAGE_SIZE)
 dataset = data_pipeline.dataset_generator()
 
-model = tf.keras.models.load_model("./saved_models/" + model_name)
+model = tf.keras.models.load_model("./saved_models/" + MODEL_NAME + '_view number_' + str(VIEW_NUMBER))
 
 for data in dataset.skip(3).take(1):
     pic = data[0]['input_1']
