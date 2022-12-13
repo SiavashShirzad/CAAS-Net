@@ -50,7 +50,7 @@ class DataPipeLine:
             return vid
 
     def mask_image_preprocessing(self, image):
-        return cv2.resize(image, (self.image_size, self.image_size))
+        return cv2.resize(image, (self.image_size, self.image_size), interpolation=cv2.INTER_NEAREST)
 
     # low dose preprocessing crops the essential parts of angiography
     def low_dose_preprocess(self, image, mask, mask2=None):
