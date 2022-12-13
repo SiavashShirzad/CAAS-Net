@@ -10,8 +10,8 @@ DATAFRAME = 'C:/CardioAI/Final series.csv'
 MODEL_NAME = 'DenseNet121'
 IMAGE_SIZE = 224
 CHANNELS = 24
-BATCH_SIZE = 1
-VIEW_NUMBER = 6
+BATCH_SIZE = 4
+VIEW_NUMBER = 2
 EPOCHS = 100
 LEARNING_RATE = 0.001
 
@@ -25,7 +25,7 @@ data_pipeline = DataPipeLine(DATA_PATH,
 dataset = data_pipeline.dataset_generator()
 
 callback = model_checkpoint_callback_LASSO = tf.keras.callbacks.ModelCheckpoint(
-    filepath='./model_weights/' + MODEL_NAME,
+    filepath='./model_weights/' + MODEL_NAME + '_view number_' + str(VIEW_NUMBER),
     monitor="val_loss",
     save_best_only=True,
     save_weights_only=True,
@@ -41,5 +41,5 @@ model.compile(
 print(model.summary())
 model.fit(dataset.skip(10), validation_data=dataset.take(10), epochs=EPOCHS, callbacks=callback)
 
-model.load_best('./model_weights/' + MODEL_NAME)
-model.save("./saved_models/" + MODEL_NAME)
+model.load_best('./model_weights/' + MODEL_NAME + '_view number_' + str(VIEW_NUMBER))
+model.save("./saved_models/" + MODEL_NAME + '_view number_' + str(VIEW_NUMBER))
