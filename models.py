@@ -242,7 +242,7 @@ class ResNetRSUnet(keras.Model):
         d4 = transpose_skip_block(d3, e1, image_size // 8)
 
         outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(d4)
-        model = tf.keras.models.Model(inputs, outputs, name="DenseNet121")
+        model = tf.keras.models.Model(inputs, outputs, name="ResnetRSUnet")
         return model
 
 
