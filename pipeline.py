@@ -54,26 +54,10 @@ class DataPipeLine:
 
     # low dose preprocessing crops the essential parts of angiography
     def low_dose_preprocess(self, image, mask, mask2=None):
-
         if mask2:
-
-            if image[:72, :].mean() < 75:
-                return (cv2.resize(image[72:440, 72:440], (self.image_size, self.image_size)),
-                        cv2.resize(mask[72:440, 72:440], (self.image_size, self.image_size),
-                                   interpolation=cv2.INTER_NEAREST),
-                        cv2.resize(mask2[72:440, 72:440], (self.image_size, self.image_size),
-                                   interpolation=cv2.INTER_NEAREST))
-            else:
-                return image, self.mask_image_preprocessing(mask), self.mask_image_preprocessing(mask2)
+            return image, mask, mask2
         else:
-
-            if image[:72, :].mean() < 75:
-                image = cv2.resize(image[72:440, 72:440], (self.image_size, self.image_size))
-                mask = cv2.resize(mask[72:440, 72:440], (self.image_size, self.image_size),
-                                  interpolation=cv2.INTER_NEAREST)
-                return image, self.mask_image_preprocessing(mask)
-            else:
-                return image, self.mask_image_preprocessing(mask)
+            return image, mask
 
     def data_generator(self):
 
@@ -106,10 +90,12 @@ class DataPipeLine:
                                                 final_image], axis=-1)
 
                         if self.view_number == 0:
-                            yield {"input_1": final_image}, {"multi": final_mask, "single": final_mask2,
+                            yield {"input_1": final_image}, {"multi": self.mask_image_preprocessing(final_mask),
+                                                             "single": self.mask_image_preprocessing(final_mask2),
                                                              "classifier": view_number}
                         else:
-                            yield {"input_1": final_image}, {"multi": final_mask, "single": final_mask2}
+                            yield {"input_1": final_image}, {"multi": self.mask_image_preprocessing(final_mask),
+                                                             "single": self.mask_image_preprocessing(final_mask2)}
 
                 else:
 
@@ -119,7 +105,7 @@ class DataPipeLine:
                         final_image = np.stack([final_image,
                                                 final_image,
                                                 final_image], axis=-1)
-                        yield {"input_1": final_image}, {"multi": final_mask}
+                        yield {"input_1": final_image}, {"multi": self.mask_image_preprocessing(final_mask)}
 
             except:
                 continue
