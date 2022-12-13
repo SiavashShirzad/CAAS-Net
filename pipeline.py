@@ -45,9 +45,9 @@ class DataPipeLine:
 
     def mask_preprocess(self, image):
         if self.view_number == 3:
-            return image
+            return cv2.resize(image, (self.image_size, self.image_size))
         else:
-            return image
+            return cv2.resize(image, (self.image_size, self.image_size))
 
     # low dose preprocessing crops the essential parts of angiography
     def low_dose_preprocess(self, image, mask, mask2=None):
@@ -73,6 +73,7 @@ class DataPipeLine:
                 return image, mask
 
     def data_generator(self):
+
         # Randomizing patients
         num_patients = self.process_dataframe().shape[0]
         patients_list = np.arange(num_patients)

@@ -19,9 +19,9 @@ def dice_coef_loss(y_true, y_pred, smooth=1e-6):
 data_path = "C:/CardioAI/nifti/"
 mask_path = 'C:/CardioAI/masks/'
 data_frame = 'C:/CardioAI/Final series.csv'
-model_name = 'SimpleUnet'
+model_name = 'ResNetRSUnet'
 
-data_pipeline = DataPipeLine(data_path, data_frame, mask_path, view_number=3, batch=2, mask2=False)
+data_pipeline = DataPipeLine(data_path, data_frame, mask_path, view_number=3, batch=2, mask2=False, image_size=224)
 dataset = data_pipeline.dataset_generator()
 
 callback = model_checkpoint_callback_LASSO = tf.keras.callbacks.ModelCheckpoint(
@@ -32,7 +32,7 @@ callback = model_checkpoint_callback_LASSO = tf.keras.callbacks.ModelCheckpoint(
     mode="auto",
 )
 
-model = ModelBuilder(512, 24, model_name)
+model = ModelBuilder(224, 24, model_name)
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
     loss={'multi': tf.keras.losses.SparseCategoricalCrossentropy()},
