@@ -1,3 +1,5 @@
+import numpy as np
+
 from model import ModelBuilder
 from pipeline import DataPipeLine
 import tensorflow as tf
@@ -8,8 +10,8 @@ DATAFRAME = 'C:/CardioAI/Final series.csv'
 MODEL_NAME = 'DenseNet121'
 IMAGE_SIZE = 224
 CHANNELS = 24
-BATCH_SIZE = 2
-VIEW_NUMBER = 3
+BATCH_SIZE = 1
+VIEW_NUMBER = 6
 EPOCHS = 100
 LEARNING_RATE = 0.001
 
@@ -21,6 +23,7 @@ data_pipeline = DataPipeLine(DATA_PATH,
                              mask2=False,
                              image_size=IMAGE_SIZE)
 dataset = data_pipeline.dataset_generator()
+
 callback = model_checkpoint_callback_LASSO = tf.keras.callbacks.ModelCheckpoint(
     filepath='./model_weights/' + MODEL_NAME,
     monitor="val_loss",
