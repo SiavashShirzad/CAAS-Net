@@ -37,7 +37,7 @@ class DataPipeLine:
 
     def data_augmentation(self, image, mask, mask2=None):
         transform = A.Compose([
-            A.HorizontalFlip(p=self.augmentation),
+            A.Rotate(limit=90, p=self.augmentation),
         ])
         if mask2 is not None:
             masks = [mask, mask2]
