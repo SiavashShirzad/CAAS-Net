@@ -1,6 +1,7 @@
 from models import DeepLabV3Builder, EfficientB0UnetBuilder, VGG16ModelBuilder, SimpleUnetBuilder, ResNet50Builder, \
     DenseNet121Unet, DenseNet121UUnet, SimpleWnetBuilder, AttentionEfficientWNet, EfficientB0UUnetBuilder, \
-    ResNet50UUnetBuilder, ResNetRSUnet, ResNetRSUUnet, ResNetRSTridentNet, EfficientTridentNet, AttentionEfficientTridentNet
+    ResNet50UUnetBuilder, ResNetRSUnet, ResNetRSUUnet, ResNetRSTridentNet, EfficientTridentNet,\
+    AttentionEfficientTridentNet
 import tensorflow as tf
 
 

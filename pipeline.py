@@ -3,6 +3,14 @@ import numpy as np
 import nibabel as nib
 import cv2
 import tensorflow as tf
+import albumentations as A
+
+
+def low_dose_preprocess(image, mask, mask2=None):
+    if mask2:
+        return image, mask, mask2
+    else:
+        return image, mask
 
 
 class DataPipeLine:
@@ -27,8 +35,17 @@ class DataPipeLine:
     def dataframe(self):
         return pd.read_csv(self.dataframe_path)
 
-    def augmentate(self, image):
-        pass
+    def data_augmentation(self, image, mask, mask2=None):
+        transform = A.Compose([
+            A.HorizontalFlip(p=self.augmentation),
+        ])
+        if mask2 is not None:
+            masks = [mask, mask2]
+            transformed = transform(image=image, masks=masks)
+            return transformed['image'], transformed['masks'][0], transformed['masks'][1]
+        else:
+            transformed = transform(image=image, mask=mask)
+            return transformed['image'], transformed['mask']
 
     def process_dataframe(self):
         if self.view_number == 0:
@@ -53,11 +70,6 @@ class DataPipeLine:
         return cv2.resize(image, (self.image_size, self.image_size), interpolation=cv2.INTER_NEAREST)
 
     # low dose preprocessing crops the essential parts of angiography
-    def low_dose_preprocess(self, image, mask, mask2=None):
-        if mask2:
-            return image, mask, mask2
-        else:
-            return image, mask
 
     def data_generator(self):
 
@@ -80,7 +92,7 @@ class DataPipeLine:
                 if self.mask2:
 
                     for img in np.unique(np.where(mask_vid > 0)[0]):
-                        final_image, final_mask = self.low_dose_preprocess(
+                        final_image, final_mask = low_dose_preprocess(
                             self.data_preprocess(img_vid[img]),
                             mask_vid[img])
                         final_mask2 = final_mask.copy()
@@ -88,6 +100,10 @@ class DataPipeLine:
                         final_image = np.stack([final_image,
                                                 final_image,
                                                 final_image], axis=-1)
+
+                        final_image, final_mask, final_mask2 = self.data_augmentation(final_image,
+                                                                                      final_mask,
+                                                                                      final_mask2)
 
                         if self.view_number == 0:
                             yield {"input_1": final_image}, {"multi": self.mask_image_preprocessing(final_mask),
@@ -100,13 +116,13 @@ class DataPipeLine:
                 else:
 
                     for img in np.unique(np.where(mask_vid > 0)[0]):
-                        final_image, final_mask = self.low_dose_preprocess(self.data_preprocess(img_vid[img]),
-                                                                           mask_vid[img])
+                        final_image, final_mask = low_dose_preprocess(self.data_preprocess(img_vid[img]),
+                                                                      mask_vid[img])
                         final_image = np.stack([final_image,
                                                 final_image,
                                                 final_image], axis=-1)
+                        final_image, final_mask = self.data_augmentation(final_image, final_mask)
                         yield {"input_1": final_image}, {"multi": self.mask_image_preprocessing(final_mask)}
-
             except:
                 continue
 
