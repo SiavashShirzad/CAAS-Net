@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 DATA_PATH = "C:/CardioAI/nifti/"
 MASK_PATH = 'C:/CardioAI/masks/'
 DATAFRAME = 'C:/CardioAI/Final series.csv'
-MODEL_NAME = 'DenseNet121'
+MODEL_NAME = 'ResnetUnet'
 IMAGE_SIZE = 224
 CHANNELS = 24
-VIEW_NUMBER = 2
+VIEW_NUMBER = 3
 
 data_pipeline = DataPipeLine(DATA_PATH,
                              DATAFRAME,
