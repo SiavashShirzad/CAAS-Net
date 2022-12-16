@@ -14,5 +14,9 @@
 
 #final evaluation set sample for AttentionEfficientWNet model:
 ![alt text](https://i.ibb.co/THxFm6r/Figure-1.png)
-this model uses dice score to optimize a decoder, which detects important areas and send the results to the multi class decoder as an input. This works as similar to attention and makes the classification easier.
+
+#final evaluation set sample for AttentionDenseWNet model:
+![alt text](https://iili.io/HotQfwl.png)
+
+These models use dice score to optimize a decoder, which detects important areas and send the results to the multi class decoder as an input. This works as similar to attention and makes the classification easier.
 
