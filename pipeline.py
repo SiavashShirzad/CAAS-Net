@@ -37,7 +37,7 @@ class DataPipeLine:
 
     def data_augmentation(self, image, mask, mask2=None):
         transform = A.Compose([
-            A.Rotate(limit=90, p=self.augmentation),
+            A.Rotate(limit=20, p=self.augmentation),
         ])
         if mask2 is not None:
             masks = [mask, mask2]
@@ -60,11 +60,18 @@ class DataPipeLine:
         image = cv2.resize(image, (self.image_size, self.image_size))
         return image / 255.0
 
-    def mask_preprocess(self, vid):
+    def mask_preprocess(self, mask_vid):
         if self.view_number == 3:
-            return vid
+            mask_vid[np.where(mask_vid < 7)] = 0
+            mask_vid[np.where(mask_vid > 12)] = 0
+            mask_vid[np.where(mask_vid == 7)] = 1
+            mask_vid[np.where(mask_vid == 8)] = 2
+            mask_vid[np.where(mask_vid == 9)] = 3
+            mask_vid[np.where(mask_vid == 10)] = 4
+            mask_vid[np.where(mask_vid == 12)] = 5
+            return mask_vid
         else:
-            return vid
+            return mask_vid
 
     def mask_image_preprocessing(self, image):
         return cv2.resize(image, (self.image_size, self.image_size), interpolation=cv2.INTER_NEAREST)
@@ -82,7 +89,6 @@ class DataPipeLine:
             try:
                 mask_vid = nib.load(self.mask_path + '/Multiple_ROI_Mask_' +
                                     self.process_dataframe().iloc[i]['File System Source'].split('\\')[1]).get_fdata()
-                mask_vid = self.mask_preprocess(mask_vid)
                 img_vid = nib.load(
                     self.data_path +
                     self.process_dataframe().iloc[i]['File System Source'].split('\\')[1]).get_fdata()
@@ -104,7 +110,7 @@ class DataPipeLine:
                         final_image, final_mask, final_mask2 = self.data_augmentation(final_image,
                                                                                       final_mask,
                                                                                       final_mask2)
-
+                        final_mask = self.mask_preprocess(final_mask)
                         if self.view_number == 0:
                             yield {"input_1": final_image}, {"multi": self.mask_image_preprocessing(final_mask),
                                                              "single": self.mask_image_preprocessing(final_mask2),
@@ -121,6 +127,7 @@ class DataPipeLine:
                         final_image = np.stack([final_image,
                                                 final_image,
                                                 final_image], axis=-1)
+                        final_mask = self.mask_preprocess(final_mask)
                         final_image, final_mask = self.data_augmentation(final_image, final_mask)
                         yield {"input_1": final_image}, {"multi": self.mask_image_preprocessing(final_mask)}
             except:

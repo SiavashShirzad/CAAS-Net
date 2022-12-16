@@ -109,10 +109,10 @@ class EfficientB0UnetBuilder(keras.Model):
         e4 = enb0.get_layer("block4a_expand_activation").output
         e5 = enb0.get_layer("block6a_expand_activation").output
 
-        d1 = transpose_skip_block(e5, e4, image_size*2)
+        d1 = transpose_skip_block(e5, e4, image_size * 2)
         d2 = transpose_skip_block(d1, e3, image_size)
-        d3 = transpose_skip_block(d2, e2, image_size//2)
-        d4 = transpose_skip_block(d3, e1, image_size//4)
+        d3 = transpose_skip_block(d2, e2, image_size // 2)
+        d4 = transpose_skip_block(d3, e1, image_size // 4)
 
         outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(d4)
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name="EfficientB0Unet")
@@ -133,9 +133,9 @@ class VGG16ModelBuilder(keras.Model):
         e4 = base.get_layer("block4_conv3").output
         e5 = base.get_layer("block5_conv3").output
         d1 = transpose_skip_block(e5, e4, image_size)
-        d2 = transpose_skip_block(d1, e3, image_size//2)
-        d3 = transpose_skip_block(d2, e2, image_size//4)
-        d4 = transpose_skip_block(d3, e1, image_size//8)
+        d2 = transpose_skip_block(d1, e3, image_size // 2)
+        d3 = transpose_skip_block(d2, e2, image_size // 4)
+        d4 = transpose_skip_block(d3, e1, image_size // 8)
 
         outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(d4)
         model = tf.keras.models.Model(inputs, outputs, name="VGG16Unet")
@@ -161,9 +161,9 @@ class SimpleUnetBuilder(keras.Model):
         e5 = conv_2d_block(e4, 2 * image_size)
 
         d1 = transpose_skip_block(e5, s4, image_size)
-        d2 = transpose_skip_block(d1, s3, image_size//2)
-        d3 = transpose_skip_block(d2, s2, image_size//4)
-        d4 = transpose_skip_block(d3, s1, image_size//8)
+        d2 = transpose_skip_block(d1, s3, image_size // 2)
+        d3 = transpose_skip_block(d2, s2, image_size // 4)
+        d4 = transpose_skip_block(d3, s1, image_size // 8)
 
         outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(d4)
 
@@ -185,9 +185,9 @@ class ResNet50Builder(keras.Model):
         e4 = base.get_layer("conv3_block4_out").output
         e5 = base.get_layer("conv4_block6_out").output
         d1 = transpose_skip_block(e5, e4, image_size)
-        d2 = transpose_skip_block(d1, e3, image_size//2)
-        d3 = transpose_skip_block(d2, e2, image_size//4)
-        d4 = transpose_skip_block(d3, e1, image_size//8)
+        d2 = transpose_skip_block(d1, e3, image_size // 2)
+        d3 = transpose_skip_block(d2, e2, image_size // 4)
+        d4 = transpose_skip_block(d3, e1, image_size // 8)
 
         outputs = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(d4)
         model = tf.keras.models.Model(inputs, outputs, name="VGG16Unet")
@@ -422,9 +422,9 @@ class SimpleWnetBuilder(keras.Model):
         e5 = conv_2d_block(e4, 2 * image_size)
 
         d1 = transpose_skip_block(e5, s4, image_size)
-        d2 = transpose_skip_block(d1, s3, image_size//2)
-        d3 = transpose_skip_block(d2, s2, image_size//4)
-        d4 = transpose_skip_block(d3, s1, image_size//8)
+        d2 = transpose_skip_block(d1, s3, image_size // 2)
+        d3 = transpose_skip_block(d2, s2, image_size // 4)
+        d4 = transpose_skip_block(d3, s1, image_size // 8)
 
         output1 = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid", name="single")(d4)
 
@@ -440,9 +440,9 @@ class SimpleWnetBuilder(keras.Model):
         e2_5 = conv_2d_block(e2_4, 2 * image_size)
 
         d2_1 = transpose_skip_block(e2_5, s2_4, image_size)
-        d2_2 = transpose_skip_block(d2_1, s2_3, image_size//2)
-        d2_3 = transpose_skip_block(d2_2, s2_2, image_size//4)
-        d2_4 = transpose_skip_block(d2_3, s2_1, image_size//8)
+        d2_2 = transpose_skip_block(d2_1, s2_3, image_size // 2)
+        d2_3 = transpose_skip_block(d2_2, s2_2, image_size // 4)
+        d2_4 = transpose_skip_block(d2_3, s2_1, image_size // 8)
 
         output2 = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multiple")(d2_4)
 
@@ -485,6 +485,44 @@ class AttentionEfficientWNet(keras.Model):
         output2 = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid", name="single")(
             bd4)
         model = tf.keras.models.Model(inputs, outputs=[output1, output2], name="AttentionEfficientWNet")
+        return model
+
+
+class AttentionDenseWNet(keras.Model):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self, image_size, number_classes):
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
+        base = tf.keras.applications.DenseNet121(
+            include_top=False,
+            weights=None,
+            input_tensor=inputs,
+        )
+        e1 = base.get_layer("input_1").output
+        e2 = base.get_layer("conv1/relu").output
+        e3 = base.get_layer("pool2_relu").output
+        e4 = base.get_layer("pool3_relu").output
+        e5 = base.get_layer("pool4_relu").output
+
+        # Binary class decoder of TridentNet
+        bd1 = transpose_skip_block(e5, e4, image_size)
+        bd2 = transpose_skip_block(bd1, e3, image_size // 2)
+        bd3 = transpose_skip_block(bd2, e2, image_size // 4)
+        bd4 = transpose_skip_block(bd3, e1, image_size // 8)
+
+        # Multi class decoder of TridentNet
+        d1 = transpose_skip_block_v2(e5, e4, bd1, image_size)
+        d2 = transpose_skip_block_v2(d1, e3, bd2, image_size // 2)
+        d3 = transpose_skip_block_v2(d2, e2, bd3, image_size // 4)
+        d4 = transpose_skip_block_v2(d3, e1, bd4, image_size // 8)
+
+        # one head will predict the mask for all coronary arteries using sigmoid, and the other predicts classes
+        output1 = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(
+            d4)
+        output2 = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid", name="single")(
+            bd4)
+        model = tf.keras.models.Model(inputs, outputs=[output1, output2], name="AttentionDenseWNet")
         return model
 
 
