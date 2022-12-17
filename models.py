@@ -526,6 +526,44 @@ class AttentionDenseWNet(keras.Model):
         return model
 
 
+class AttentionResNetRSWNet(keras.Model):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self, image_size, number_classes):
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
+        base = tf.keras.applications.resnet_rs.ResNetRS50(
+            include_top=False,
+            weights=None,
+            input_tensor=inputs,
+        )
+        e1 = base.get_layer("input_1").output
+        e2 = base.get_layer("stem_1_stem_act_3").output
+        e3 = base.get_layer("BlockGroup3__block_0__act_1").output
+        e4 = base.get_layer("BlockGroup4__block_0__act_1").output
+        e5 = base.get_layer("BlockGroup5__block_0__act_1").output
+
+        # Binary class decoder of TridentNet
+        bd1 = transpose_skip_block(e5, e4, image_size)
+        bd2 = transpose_skip_block(bd1, e3, image_size // 2)
+        bd3 = transpose_skip_block(bd2, e2, image_size // 4)
+        bd4 = transpose_skip_block(bd3, e1, image_size // 8)
+
+        # Multi class decoder of TridentNet
+        d1 = transpose_skip_block_v2(e5, e4, bd1, image_size)
+        d2 = transpose_skip_block_v2(d1, e3, bd2, image_size // 2)
+        d3 = transpose_skip_block_v2(d2, e2, bd3, image_size // 4)
+        d4 = transpose_skip_block_v2(d3, e1, bd4, image_size // 8)
+
+        # one head will predict the mask for all coronary arteries using sigmoid, and the other predicts classes
+        output1 = tf.keras.layers.Conv2D(number_classes, 1, padding="same", activation="softmax", name="multi")(
+            d4)
+        output2 = tf.keras.layers.Conv2D(1, 1, padding="same", activation="sigmoid", name="single")(
+            bd4)
+        model = tf.keras.models.Model(inputs, outputs=[output1, output2], name="AttentionResNetRSWNet")
+        return model
+
+
 # Multi-task learning
 # A new model named trident-Net
 
