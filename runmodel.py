@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 DATA_PATH = "C:/CardioAI/nifti/"
 MASK_PATH = 'C:/CardioAI/masks/'
 DATAFRAME = 'C:/CardioAI/Final series.csv'
-MODEL_NAME = 'AttentionDenseWNet'
+MODEL_NAME = 'AttentionResNetRSWNet'
 IMAGE_SIZE = 512
 CHANNELS = 24
 VIEW_NUMBER = 3

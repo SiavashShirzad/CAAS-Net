@@ -61,6 +61,28 @@ class DataPipeLine:
         return image / 255.0
 
     def mask_preprocess(self, mask_vid):
+        if self.view_number == 1:
+            mask_vid[np.where(mask_vid < 6)] = 0
+            mask_vid[np.where(mask_vid == 6)] = 1
+            mask_vid[np.where(mask_vid == 7)] = 0
+            mask_vid[np.where(mask_vid == 8)] = 2
+            mask_vid[np.where(mask_vid == 9)] = 3
+            mask_vid[np.where(mask_vid == 14)] = 4
+            mask_vid[np.where(mask_vid == 15)] = 5
+            mask_vid[np.where(mask_vid == 16)] = 6
+            mask_vid[np.where(mask_vid == 24)] = 6
+            mask_vid[np.where(mask_vid == 17)] = 7
+            mask_vid[np.where(mask_vid == 18)] = 8
+            mask_vid[np.where(mask_vid == 19)] = 8
+            mask_vid[np.where(mask_vid == 20)] = 8
+            mask_vid[np.where(mask_vid == 25)] = 9
+            return mask_vid
+        if self.view_number == 2:
+            mask_vid[np.where(mask_vid == 8)] = 1
+            mask_vid[np.where(mask_vid == 9)] = 2
+            mask_vid[np.where(mask_vid == 10)] = 3
+            mask_vid[np.where(mask_vid == 12)] = 3
+            return mask_vid
         if self.view_number == 3:
             mask_vid[np.where(mask_vid < 7)] = 0
             mask_vid[np.where(mask_vid > 12)] = 0
@@ -69,6 +91,22 @@ class DataPipeLine:
             mask_vid[np.where(mask_vid == 9)] = 3
             mask_vid[np.where(mask_vid == 10)] = 4
             mask_vid[np.where(mask_vid == 12)] = 5
+            return mask_vid
+        if self.view_number == 4:
+            mask_vid[np.where(mask_vid == 1)] = 1
+            mask_vid[np.where(mask_vid == 3)] = 1
+            mask_vid[np.where(mask_vid == 4)] = 2
+            mask_vid[np.where(mask_vid == 11)] = 0
+            return mask_vid
+        if self.view_number == 4:
+            mask_vid[np.where(mask_vid == 21)] = 6
+            mask_vid[np.where(mask_vid == 22)] = 6
+            mask_vid[np.where(mask_vid == 23)] = 6
+            return mask_vid
+        if self.view_number == 4:
+            mask_vid[np.where(mask_vid == 21)] = 6
+            mask_vid[np.where(mask_vid == 22)] = 6
+            mask_vid[np.where(mask_vid == 23)] = 6
             return mask_vid
         else:
             return mask_vid
