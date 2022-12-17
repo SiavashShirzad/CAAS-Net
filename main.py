@@ -47,30 +47,27 @@ data_pipeline = DataPipeLine(DATA_PATH,
                              augmentation=DATA_AUGMENTATION)
 dataset = data_pipeline.dataset_generator()
 
-for i in dataset:
-    print(np.unique(i[1]['multi']))
+callback = model_checkpoint_callback_LASSO = tf.keras.callbacks.ModelCheckpoint(
+    filepath='./model_weights/' + MODEL_NAME + '_view number_' + str(VIEW_NUMBER),
+    monitor="val_loss",
+    save_best_only=True,
+    save_weights_only=True,
+    mode="auto",
+)
 
-# callback = model_checkpoint_callback_LASSO = tf.keras.callbacks.ModelCheckpoint(
-#     filepath='./model_weights/' + MODEL_NAME + '_view number_' + str(VIEW_NUMBER),
-#     monitor="val_loss",
-#     save_best_only=True,
-#     save_weights_only=True,
-#     mode="auto",
-# )
-#
-# model = ModelBuilder(IMAGE_SIZE, CHANNELS, MODEL_NAME)
-# model.compile(
-#     optimizer=tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE),
-#     loss={'multi': tf.keras.losses.SparseCategoricalCrossentropy(),
-#           'single': dice_coef_loss},
-#     metrics={'multi': ['Accuracy'],
-#              'single': ['Accuracy', 'Precision', 'Recall']}
-# )
-# print(model.summary())
-# model.fit(dataset.skip(5),
-#           validation_data=dataset.take(5),
-#           epochs=EPOCHS,
-#           callbacks=[callback, tf.keras.callbacks.LearningRateScheduler(lr_schedule)])
-#
-# model.load_best('./model_weights/' + MODEL_NAME + '_view number_' + str(VIEW_NUMBER))
-# model.save("./saved_models/" + MODEL_NAME + '_view number_' + str(VIEW_NUMBER))
+model = ModelBuilder(IMAGE_SIZE, CHANNELS, MODEL_NAME)
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE),
+    loss={'multi': tf.keras.losses.SparseCategoricalCrossentropy(),
+          'single': dice_coef_loss},
+    metrics={'multi': ['Accuracy'],
+             'single': ['Accuracy', 'Precision', 'Recall']}
+)
+print(model.summary())
+model.fit(dataset.skip(5),
+          validation_data=dataset.take(5),
+          epochs=EPOCHS,
+          callbacks=[callback, tf.keras.callbacks.LearningRateScheduler(lr_schedule)])
+
+model.load_best('./model_weights/' + MODEL_NAME + '_view number_' + str(VIEW_NUMBER))
+model.save("./saved_models/" + MODEL_NAME + '_view number_' + str(VIEW_NUMBER))

@@ -60,7 +60,7 @@ class DataPipeLine:
         image = cv2.resize(image, (self.image_size, self.image_size))
         return image / 255.0
 
-    def mask_preprocess(self, mask_vid):
+    def mask_preprocess(self, mask_vid: np.array):
         if self.view_number == 1:
             mask_vid[np.where(mask_vid < 6)] = 0
             mask_vid[np.where(mask_vid == 6)] = 1
