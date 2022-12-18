@@ -7,11 +7,11 @@ from tensorflow.keras import backend as K
 DATA_PATH = "C:/CardioAI/nifti/"
 MASK_PATH = 'C:/CardioAI/masks/'
 DATAFRAME = 'C:/CardioAI/Final series.csv'
-MODEL_NAME = 'AttentionResNetRSWNet'
+MODEL_NAME = 'DenseNet121'
 DATA_AUGMENTATION = 0.5
 IMAGE_SIZE = 512
 CHANNELS = 6
-BATCH_SIZE = 1
+BATCH_SIZE = 2
 VIEW_NUMBER = 6
 EPOCHS = 120
 LEARNING_RATE = 0.005
@@ -56,6 +56,7 @@ callback = model_checkpoint_callback_LASSO = tf.keras.callbacks.ModelCheckpoint(
 )
 
 model = ModelBuilder(IMAGE_SIZE, CHANNELS, MODEL_NAME)
+
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE),
     loss={'multi': tf.keras.losses.SparseCategoricalCrossentropy(),

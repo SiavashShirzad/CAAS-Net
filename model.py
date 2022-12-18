@@ -16,10 +16,6 @@ class ModelBuilder:
             model_builder = DeepLabV3Builder()
             self.model = model_builder(self.image_size, self.number_classes)
 
-        if self.model_name == "AttentionEfficientTridentNet":
-            model_builder = AttentionEfficientTridentNet()
-            self.model = model_builder(self.image_size, self.number_classes)
-
         if self.model_name == "EfficientB0Unet":
             model_builder = EfficientB0UnetBuilder()
             self.model = model_builder(self.image_size, self.number_classes)
@@ -82,6 +78,10 @@ class ModelBuilder:
 
         if self.model_name == "EfficientTridentNet":
             model_builder = EfficientTridentNet()
+            self.model = model_builder(self.image_size, self.number_classes)
+
+        if self.model_name == "AttentionEfficientTridentNet":
+            model_builder = AttentionEfficientTridentNet()
             self.model = model_builder(self.image_size, self.number_classes)
 
     def summary(self):
