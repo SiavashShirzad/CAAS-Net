@@ -6,11 +6,24 @@ import tensorflow as tf
 import albumentations as A
 
 
+# low dose preprocessing crops the essential parts of angiography
 def low_dose_preprocess(image, mask, mask2=None):
     if mask2:
-        return image, mask, mask2
+
+        if image[:72, :].mean() < 75:
+            return (image[72:440, 72:440],
+                    mask[72:440, 72:440],
+                    mask2[72:440, 72:440])
+        else:
+            return image, mask, mask2
     else:
-        return image, mask
+
+        if image[:72, :].mean() < 75:
+            image = image[72:440, 72:440]
+            mask = mask[72:440, 72:440]
+            return image, mask
+        else:
+            return image, mask
 
 
 class DataPipeLine:
@@ -137,8 +150,9 @@ class DataPipeLine:
 
                     for img in np.unique(np.where(mask_vid > 0)[0]):
                         final_image, final_mask = low_dose_preprocess(
-                            self.data_preprocess(img_vid[img]),
+                            img_vid[img],
                             mask_vid[img])
+                        final_image = self.data_preprocess(final_image)
                         final_mask2 = final_mask.copy()
                         final_mask2[np.where(final_mask2 > 0)] = 1
                         final_image = np.stack([final_image,
@@ -160,8 +174,9 @@ class DataPipeLine:
                 else:
 
                     for img in np.unique(np.where(mask_vid > 0)[0]):
-                        final_image, final_mask = low_dose_preprocess(self.data_preprocess(img_vid[img]),
+                        final_image, final_mask = low_dose_preprocess(img_vid[img],
                                                                       mask_vid[img])
+                        final_image = self.data_preprocess(final_image)
                         final_image = np.stack([final_image,
                                                 final_image,
                                                 final_image], axis=-1)
