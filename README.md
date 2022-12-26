@@ -11,7 +11,6 @@
 #final evaluation set sample for Simple U-Net model:
 ![alt text](https://i.ibb.co/72zX9Cw/Figure-1.png)
 
-
 #final evaluation set sample for AttentionEfficientWNet model:
 ![alt text](https://i.ibb.co/THxFm6r/Figure-1.png)
 
