@@ -2,13 +2,15 @@ import tensorflow as tf
 from pipeline import DataPipeLine
 import numpy as np
 import matplotlib.pyplot as plt
+from metrics import MultipleClassSegmentationMetrics
 
 DATA_PATH = "C:/CardioAI/nifti/"
 MASK_PATH = 'C:/CardioAI/masks/'
 DATAFRAME = 'C:/CardioAI/Final series.csv'
 MODEL_NAME = 'DenseNet121'
 IMAGE_SIZE = 512
-VIEW_NUMBER = 6
+VIEW_NUMBER = 5
+CHANNELS = 7
 
 data_pipeline = DataPipeLine(DATA_PATH,
                              DATAFRAME,
@@ -20,7 +22,9 @@ data_pipeline = DataPipeLine(DATA_PATH,
                              augmentation=0.0)
 dataset = data_pipeline.dataset_generator()
 
-model = tf.keras.models.load_model("./saved_models/" + MODEL_NAME + '_view number_' + str(VIEW_NUMBER))
+metrics = MultipleClassSegmentationMetrics(CHANNELS)
+model = tf.keras.models.load_model("./saved_models/" + MODEL_NAME + '_view number_' + str(VIEW_NUMBER),
+                                   custom_objects={'dice_multi_coef': metrics.dice_multi_coef})
 
 for data in dataset.skip(12).take(1):
     pic = data[0]['input_1']
