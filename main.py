@@ -2,7 +2,6 @@ import numpy as np
 from model import ModelBuilder
 from pipeline import DataPipeLine
 import tensorflow as tf
-from tensorflow.keras import backend as K
 from metrics import MultipleClassSegmentationMetrics
 
 DATA_PATH = "C:/CardioAI/nifti/"

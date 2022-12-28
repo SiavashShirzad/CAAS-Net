@@ -50,8 +50,13 @@ class DataPipeLine:
 
     def data_augmentation(self, image, mask, mask2=None):
         transform = A.Compose([
-            A.Rotate(limit=20, p=self.augmentation),
-        ])
+            A.GaussNoise(),
+            A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.1, rotate_limit=35, p=0.7),
+            A.OneOf([
+                A.MotionBlur(p=0.2),
+                A.Blur(blur_limit=3, p=0.1),
+            ], p=0.5),
+        ], p=self.augmentation)
         if mask2 is not None:
             masks = [mask, mask2]
             transformed = transform(image=image, masks=masks)
@@ -145,46 +150,45 @@ class DataPipeLine:
                     self.process_dataframe().iloc[i]['File System Source'].split('\\')[1]).get_fdata()
                 df = self.process_dataframe()
                 view_number = int(df.iloc[i]["Description"][-1])
-
-                if self.mask2:
-
-                    for img in np.unique(np.where(mask_vid > 0)[0]):
-                        final_image, final_mask = low_dose_preprocess(
-                            img_vid[img],
-                            mask_vid[img])
-                        final_image = self.data_preprocess(final_image)
-                        final_mask2 = final_mask.copy()
-                        final_mask2[np.where(final_mask2 > 0)] = 1
-                        final_image = np.stack([final_image,
-                                                final_image,
-                                                final_image], axis=-1)
-
-                        final_image, final_mask, final_mask2 = self.data_augmentation(final_image,
-                                                                                      final_mask,
-                                                                                      final_mask2)
-                        final_mask = self.mask_preprocess(final_mask)
-                        if self.view_number == 0:
-                            yield {"input_1": final_image}, {"multi": self.mask_image_preprocessing(final_mask),
-                                                             "single": self.mask_image_preprocessing(final_mask2),
-                                                             "classifier": view_number}
-                        else:
-                            yield {"input_1": final_image}, {"multi": self.mask_image_preprocessing(final_mask),
-                                                             "single": self.mask_image_preprocessing(final_mask2)}
-
-                else:
-
-                    for img in np.unique(np.where(mask_vid > 0)[0]):
-                        final_image, final_mask = low_dose_preprocess(img_vid[img],
-                                                                      mask_vid[img])
-                        final_image = self.data_preprocess(final_image)
-                        final_image = np.stack([final_image,
-                                                final_image,
-                                                final_image], axis=-1)
-                        final_mask = self.mask_preprocess(final_mask)
-                        final_image, final_mask = self.data_augmentation(final_image, final_mask)
-                        yield {"input_1": final_image}, {"multi": self.mask_image_preprocessing(final_mask)}
             except:
                 continue
+            if self.mask2:
+                for img in np.unique(np.where(mask_vid > 0)[0]):
+                    final_image, final_mask = low_dose_preprocess(
+                        img_vid[img],
+                        mask_vid[img])
+                    final_image = self.data_preprocess(final_image)
+                    final_mask2 = final_mask.copy()
+                    final_mask2[np.where(final_mask2 > 0)] = 1
+                    final_image = np.stack([final_image,
+                                            final_image,
+                                            final_image], axis=-1)
+
+                    final_image, final_mask, final_mask2 = self.data_augmentation(final_image,
+                                                                                  final_mask,
+                                                                                  final_mask2)
+                    final_mask = self.mask_preprocess(final_mask)
+                    if self.view_number == 0:
+                        yield {"input_1": final_image}, {"multi": self.mask_image_preprocessing(final_mask),
+                                                         "single": self.mask_image_preprocessing(final_mask2),
+                                                         "classifier": view_number}
+                    else:
+                        yield {"input_1": final_image}, {"multi": self.mask_image_preprocessing(final_mask),
+                                                         "single": self.mask_image_preprocessing(final_mask2)}
+
+            else:
+
+                for img in np.unique(np.where(mask_vid > 0)[0]):
+                    final_image, final_mask = low_dose_preprocess(img_vid[img],
+                                                                  mask_vid[img])
+                    final_image = self.data_preprocess(final_image)
+                    final_image = np.stack([final_image,
+                                            final_image,
+                                            final_image], axis=-1)
+                    final_mask = self.mask_preprocess(final_mask)
+                    final_image, final_mask = self.data_augmentation(final_image, final_mask)
+                    yield {"input_1": final_image}, {"multi": self.mask_image_preprocessing(final_mask)}
+
 
     def dataset_generator(self) -> tf.data.Dataset:
         if self.view_number == 0:
