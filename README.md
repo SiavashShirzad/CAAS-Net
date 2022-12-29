@@ -8,6 +8,9 @@
 #final evaluation set sample for DenseNet121 model in LAO Cranial view:
 ![alt text](https://i.ibb.co/Wx8nrGL/Figure-1.png)
 
+#final evaluation set sample for DenseNet121 model in LAO Caudal view:
+![alt text](https://i.imgur.com/TUkyn3S.png)
+
 #final evaluation set sample for DenseNet121 model in LAO Straight view:
 ![alt text](https://iili.io/HIQExlR.png)
 
