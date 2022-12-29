@@ -9,7 +9,7 @@ MASK_PATH = 'C:/CardioAI/masks/'
 DATAFRAME = 'C:/CardioAI/Final series.csv'
 MODEL_NAME = 'DenseNet121'
 IMAGE_SIZE = 512
-VIEW_NUMBER = 5
+VIEW_NUMBER = 4
 CHANNELS = 7
 
 data_pipeline = DataPipeLine(DATA_PATH,
