@@ -50,7 +50,6 @@ class DataPipeLine:
 
     def data_augmentation(self, image, mask, mask2=None):
         transform = A.Compose([
-            A.GaussNoise(),
             A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.1, rotate_limit=35, p=0.7),
             A.OneOf([
                 A.MotionBlur(p=0.2),
@@ -111,10 +110,18 @@ class DataPipeLine:
             mask_vid[np.where(mask_vid == 12)] = 5
             return mask_vid
         if self.view_number == 4:
-            mask_vid[np.where(mask_vid == 1)] = 1
-            mask_vid[np.where(mask_vid == 3)] = 1
-            mask_vid[np.where(mask_vid == 4)] = 2
-            mask_vid[np.where(mask_vid == 11)] = 0
+            mask_vid[np.where(mask_vid == 6)] = 1
+            mask_vid[np.where(mask_vid == 7)] = 2
+            mask_vid[np.where(mask_vid == 10)] = 3
+            mask_vid[np.where(mask_vid == 14)] = 4
+            mask_vid[np.where(mask_vid == 15)] = 4
+            mask_vid[np.where(mask_vid == 17)] = 4
+            mask_vid[np.where(mask_vid == 16)] = 5
+            mask_vid[np.where(mask_vid == 24)] = 5
+            mask_vid[np.where(mask_vid == 18)] = 6
+            mask_vid[np.where(mask_vid == 19)] = 6
+            mask_vid[np.where(mask_vid == 20)] = 6
+            mask_vid[np.where(mask_vid > 6)] = 0
             return mask_vid
         if self.view_number == 5:
             mask_vid[np.where(mask_vid == 21)] = 6
