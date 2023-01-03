@@ -93,6 +93,7 @@ class DataPipeLine:
             mask_vid[np.where(mask_vid == 19)] = 8
             mask_vid[np.where(mask_vid == 20)] = 8
             mask_vid[np.where(mask_vid == 25)] = 9
+            mask_vid[np.where(mask_vid > 9)] = 0
             return mask_vid
         if self.view_number == 2:
             mask_vid[np.where(mask_vid == 8)] = 1

@@ -2,6 +2,9 @@
 
 # Fully automated anatomic segmentation for coronary artery angiography
 
+#final evaluation set sample for DeepLabV3 model in RAO Caudal view:
+![alt text](https://iili.io/HuZcOEg.png)
+
 #final evaluation set sample for DeepLabV3 model in LAO Cranial view:
 ![alt text](https://i.ibb.co/X8VCRv6/Figure-1.png)
 
