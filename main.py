@@ -7,12 +7,12 @@ import matplotlib.pyplot as plt
 DATA_PATH = "C:/CardioAI/nifti/"
 MASK_PATH = 'C:/CardioAI/masks/'
 DATAFRAME = 'C:/CardioAI/Final series.csv'
-MODEL_NAME = 'DenseNet121'
+MODEL_NAME = 'ResnetUnet'
 DATA_AUGMENTATION = 0.8
 IMAGE_SIZE = 512
-CHANNELS = 10
+CHANNELS = 4
 BATCH_SIZE = 2
-VIEW_NUMBER = 1
+VIEW_NUMBER = 2
 EPOCHS = 120
 LEARNING_RATE = 0.002
 LEARNING_RATE_DECAY = -0.04
