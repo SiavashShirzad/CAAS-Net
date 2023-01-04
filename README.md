@@ -8,6 +8,12 @@
 #final evaluation set sample for DeepLabV3 model in LAO Cranial view:
 ![alt text](https://i.ibb.co/X8VCRv6/Figure-1.png)
 
+#final evaluation set sample for ResNet50 model in LAO Cranial view:
+![alt text](https://iili.io/HAh7Saf.png)
+
+#final evaluation set sample for ResNet50 model in LAO Cranial view:
+![alt text](https://iili.io/HAh7LGe.png)
+
 #final evaluation set sample for DenseNet121 model in LAO Cranial view:
 ![alt text](https://i.ibb.co/Wx8nrGL/Figure-1.png)
 

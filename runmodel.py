@@ -7,10 +7,10 @@ from metrics import MultipleClassSegmentationMetrics
 DATA_PATH = "C:/CardioAI/nifti/"
 MASK_PATH = 'C:/CardioAI/masks/'
 DATAFRAME = 'C:/CardioAI/Final series.csv'
-MODEL_NAME = 'DenseNet121'
+MODEL_NAME = 'ResnetUnet'
 IMAGE_SIZE = 512
-VIEW_NUMBER = 1
-CHANNELS = 10
+VIEW_NUMBER = 2
+CHANNELS = 4
 
 data_pipeline = DataPipeLine(DATA_PATH,
                              DATAFRAME,
