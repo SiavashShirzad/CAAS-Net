@@ -68,7 +68,7 @@ class DeepLabV3Builder(keras.Model):
     def deep_lab_v3_plus(self, image_size, num_classes):
         model_input = tf.keras.Input(shape=(image_size, image_size, 3))
         resnet = tf.keras.applications.ResNet50(
-            weights="imagenet", include_top=False, input_tensor=model_input
+            weights=None, include_top=False, input_tensor=model_input
         )
         x = resnet.get_layer("conv4_block6_2_relu").output
         x = self.dilated_spatial_pyramid_pooling(x)
@@ -100,8 +100,8 @@ class EfficientB0UnetBuilder(keras.Model):
         super().__init__()
 
     def __call__(self, image_size, number_classes):
-        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        enb0 = tf.keras.applications.EfficientNetB0(include_top=False, weights="imagenet", input_tensor=inputs)
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3), name='input_1')
+        enb0 = tf.keras.applications.EfficientNetB0(include_top=False, weights=None, input_tensor=inputs)
 
         e1 = enb0.get_layer("input_1").output
         e2 = enb0.get_layer("block2a_expand_activation").output
@@ -124,8 +124,8 @@ class VGG16ModelBuilder(keras.Model):
         super().__init__()
 
     def __call__(self, image_size, number_classes):
-        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        base = tf.keras.applications.VGG16(include_top=False, weights="imagenet", input_tensor=inputs)
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3), name='input_1')
+        base = tf.keras.applications.VGG16(include_top=False, weights=None, input_tensor=inputs)
 
         e1 = base.get_layer("block1_conv2").output
         e2 = base.get_layer("block2_conv2").output
@@ -148,7 +148,7 @@ class SimpleUnetBuilder(keras.Model):
         super().__init__()
 
     def __call__(self, image_size, number_classes):
-        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3), name='input_1')
 
         s1 = conv_2d_block(inputs, image_size / 8)
         e1 = tf.keras.layers.MaxPooling2D((2, 2))(s1)
@@ -176,8 +176,8 @@ class ResNet50Builder(keras.Model):
         super().__init__()
 
     def __call__(self, image_size, number_classes):
-        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        base = tf.keras.applications.ResNet50(include_top=False, weights="imagenet", input_tensor=inputs)
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3), name='input_1')
+        base = tf.keras.applications.ResNet50(include_top=False, weights=None, input_tensor=inputs)
 
         e1 = base.get_layer("input_1").output
         e2 = base.get_layer("conv1_relu").output
@@ -200,8 +200,8 @@ class DenseNet121Unet(keras.Model):
         super().__init__()
 
     def __call__(self, image_size, number_classes):
-        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        base = tf.keras.applications.DenseNet121(include_top=False, weights="imagenet", input_tensor=inputs)
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3), name='input_1')
+        base = tf.keras.applications.DenseNet121(include_top=False, weights=None, input_tensor=inputs)
 
         e1 = base.get_layer("input_1").output
         e2 = base.get_layer("conv1/relu").output
@@ -224,7 +224,7 @@ class ResNetRSUnet(keras.Model):
         super().__init__()
 
     def __call__(self, image_size, number_classes):
-        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3), name='input_1')
         base = tf.keras.applications.resnet_rs.ResNetRS50(
             include_top=False,
             weights=None,
@@ -258,8 +258,8 @@ class DenseNet121UUnet(keras.Model):
         super().__init__()
 
     def __call__(self, image_size, number_classes):
-        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        base = tf.keras.applications.DenseNet121(include_top=False, weights="imagenet", input_tensor=inputs)
+        inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3), name='input_1')
+        base = tf.keras.applications.DenseNet121(include_top=False, weights=None, input_tensor=inputs)
 
         e1 = base.get_layer("input_1").output
         e2 = base.get_layer("conv1/relu").output
@@ -294,7 +294,7 @@ class EfficientB0UUnetBuilder(keras.Model):
 
     def __call__(self, image_size, number_classes):
         inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        base = tf.keras.applications.EfficientNetB0(include_top=False, weights="imagenet", input_tensor=inputs)
+        base = tf.keras.applications.EfficientNetB0(include_top=False, weights=None, input_tensor=inputs)
 
         e1 = base.get_layer("input_1").output
         e2 = base.get_layer("block2a_expand_activation").output
@@ -367,7 +367,7 @@ class ResNet50UUnetBuilder(keras.Model):
 
     def __call__(self, image_size, number_classes):
         inputs = tf.keras.layers.Input(shape=(image_size, image_size, 3))
-        base = tf.keras.applications.ResNet50(include_top=False, weights="imagenet", input_tensor=inputs)
+        base = tf.keras.applications.ResNet50(include_top=False, weights=None, input_tensor=inputs)
 
         e1 = base.get_layer("input_1").output
         e2 = base.get_layer("conv1_relu").output

@@ -19,4 +19,3 @@ class visualizer:
             ax = plt.subplot(1, 3, 3)
             plt.imshow(np.argmax(self.prediction[0], axis=-1))
             plt.show()
-

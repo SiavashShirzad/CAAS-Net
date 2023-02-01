@@ -91,7 +91,7 @@ class ModelBuilder:
         self.model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
 
     def fit(self, dataset, validation_data=None, epochs=100, callbacks=None):
-        return self.model.fit(dataset, validation_data=validation_data, epochs=epochs, callbacks=callbacks)
+        return self.model.fit(dataset, validation_data=validation_data, epochs=epochs, callbacks=callbacks, verbose=1)
 
     def evaluate(self, data):
         return self.model.evaluate(data)

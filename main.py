@@ -7,12 +7,12 @@ import matplotlib.pyplot as plt
 DATA_PATH = "C:/CardioAI/nifti/"
 MASK_PATH = 'C:/CardioAI/masks/'
 DATAFRAME = 'C:/CardioAI/Final series.csv'
-MODEL_NAME = 'ResnetUnet'
+MODEL_NAME = 'SimpleUnet'
 DATA_AUGMENTATION = 0.8
 IMAGE_SIZE = 512
-CHANNELS = 4
+CHANNELS = 7
 BATCH_SIZE = 2
-VIEW_NUMBER = 2
+VIEW_NUMBER = 6
 EPOCHS = 120
 LEARNING_RATE = 0.002
 LEARNING_RATE_DECAY = -0.04
@@ -27,7 +27,7 @@ def lr_schedule(epoch, lr):
         return lr * tf.math.exp(LEARNING_RATE_DECAY)
 
 
-if __name__ == '__main__':
+def main():
     data_pipeline = DataPipeLine(DATA_PATH,
                                  DATAFRAME,
                                  MASK_PATH,
@@ -70,3 +70,7 @@ if __name__ == '__main__':
 
     model.load_best('./model_weights/' + MODEL_NAME + '_view number_' + str(VIEW_NUMBER))
     model.save("./saved_models/" + MODEL_NAME + '_view number_' + str(VIEW_NUMBER))
+
+
+if __name__ == '__main__':
+    main()
